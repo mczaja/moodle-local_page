@@ -19,5 +19,8 @@ This module allows users to create and manage custom pages within Moodle. It pro
 - **Access Level**: Specify the capabilities required to view the page. Use commas to separate multiple capabilities.
 - **Additional HTML**: Optionally add custom HTML to the `<head>` section of the page for additional styling or scripts.
 
+## Documentation
+https://rosea.gitbook.io/page-by-roseathemes
+
 ## Help
 For more information, refer to the support@rosea.io
