@@ -1,0 +1,11 @@
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Redirect requests for index.php to the same URL without index.php
+    RewriteRule ^index\.php$ - [L]
+
+    # If the requested file or directory does not exist, redirect to index.php
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^(.*)$ index.php [L]
+</IfModule>

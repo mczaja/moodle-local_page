@@ -1,0 +1,32 @@
+<XMLDB xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" PATH="local/page/db" VERSION="20250401" COMMENT="XMLDB file for Moodle local/page" xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd">
+    <TABLES>
+        <TABLE NAME="local_page" COMMENT="Custom pages for the local_page plugin">
+            <FIELDS>
+                <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true" COMMENT="Primary key for the table" />
+                <FIELD NAME="pagename" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="Name of the custom page" />
+                <FIELD NAME="meta" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Meta information for the page" />
+                <FIELD NAME="pagecontent" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="HTML content of the page" />
+                <FIELD NAME="deleted" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Flag to indicate if the page has been deleted (1=deleted)" />
+                <FIELD NAME="pagedate" TYPE="int" LENGTH="20" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Timestamp of when the page was created or modified" />
+                <FIELD NAME="enddate" TYPE="int" LENGTH="20" NOTNULL="false" DEFAULT="0" SEQUENCE="false" COMMENT="Timestamp of when the page will be unpublished" />
+                <FIELD NAME="accesslevel" TYPE="char" LENGTH="100" NOTNULL="false" SEQUENCE="false" COMMENT="Access level required to view the page" />
+                <FIELD NAME="menuname" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="Name to display in navigation menu" />
+                <FIELD NAME="pagedata" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Additional JSON data for the page" />
+                <FIELD NAME="status" TYPE="char" LENGTH="10" NOTNULL="true" DEFAULT="live" SEQUENCE="false" COMMENT="Status of the page" />
+                <FIELD NAME="metadescription" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Meta description for the page" />
+                <FIELD NAME="metakeywords" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Meta keywords for the page" />
+                <FIELD NAME="metaauthor" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Meta author for the page" />
+                <FIELD NAME="metatitle" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Meta title for the page" />
+                <FIELD NAME="metarobots" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Meta robots for the page" />
+                <FIELD NAME="onlyloggedin" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Flag to indicate if the page is only visible to logged in users" />
+            </FIELDS>
+            <KEYS>
+                <KEY NAME="primary" TYPE="primary" FIELDS="id" />
+            </KEYS>
+            <INDEXES>
+                <INDEX NAME="deleted" UNIQUE="false" FIELDS="deleted" COMMENT="Index for deleted flag to improve query performance" />
+                <INDEX NAME="pagename" UNIQUE="false" FIELDS="pagename(255)" COMMENT="Index for page name searches" />
+            </INDEXES>
+        </TABLE>
+    </TABLES>
+</XMLDB>
