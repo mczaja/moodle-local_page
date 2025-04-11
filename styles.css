@@ -1,111 +1,110 @@
 .custompages-item {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-    gap: 16px; /* Adjust the gap between grid items as needed */
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 16px; /* Adjust the gap between grid items as needed */
 }
 
 .custompages-card-body {
-    border-width: 1px 1px 3px 1px;
-    border-style: solid;
-    border-color: #e0e0e0;
-    padding: 16px;
+  border-width: 1px 1px 3px 1px;
+  border-style: solid;
+  border-color: #e0e0e0;
+  padding: 16px;
 }
 
 .custompages-card-body--draft {
-    border-width: 2px;
-    border-style: dashed;
+  border-width: 2px;
+  border-style: dashed;
 }
 
 .custompages-card-body--archived {
-    border-width: 2px;
-    border-style: dashed;
-    border-color: #e0e0e0;
-    opacity: .7;
+  border-width: 2px;
+  border-style: dashed;
+  border-color: #e0e0e0;
+  opacity: 0.7;
 
-    &:hover {
-        opacity: 1;
-    }
+  &:hover {
+    opacity: 1;
+  }
 }
 
 .theme-dark .custompages-card-body {
-    border-color: #e0e0e0;
+  border-color: #e0e0e0;
 }
 
 .custompages-title {
-    margin: 16px 0;
-    font-size: 16px;
+  margin: 16px 0;
+  font-size: 16px;
 }
 
 .custompages-btn-group {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
 }
 
 .custompages-btn-group .btn {
-    display: block;
-    width: 100%;
+  display: block;
+  width: 100%;
 }
 
 .local-page-status-draft .page-header-headings:before,
 .local-page-status-live .page-header-headings:before,
 .local-page-status-archived .page-header-headings:before {
-    margin-bottom: 10px;
-    padding: 4px 8px;
-    border-radius: 4px;
-    font-size: 12px;
-    font-weight: bold;
-    color: #515151;
-    position: absolute;
-    top: -40px;
+  margin-bottom: 10px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: bold;
+  color: #515151;
+  position: absolute;
+  top: -40px;
 }
 
 .local-page-status-live h1.page-header-headings:before {
-    content: 'Live';
-    background-color: #bfe7bf;
+  content: "Live";
+  background-color: #bfe7bf;
 }
 
 .local-page-status-draft h1.page-header-headings:before {
-    content: 'Draft';
-    background-color: moccasin;
+  content: "Draft";
+  background-color: moccasin;
 }
 
 .local-page-status-archived h1.page-header-headings:before {
-    content: 'Archived';
-    background-color: #e7baba;
+  content: "Archived";
+  background-color: #e7baba;
 }
 
-
 .custompages-title-badge-label {
-    font-size: 11px;
-    padding: 2px 6px;
-    margin: 0;
-    background-color: #f0f0f0;
-    border-radius: 4px 4px 0 0
+  font-size: 11px;
+  padding: 2px 6px;
+  margin: 0;
+  background-color: #f0f0f0;
+  border-radius: 4px 4px 0 0;
 }
 
 .custompage-url {
-    font-size: 12px;
-    color: #888;
-    background-color: #f0f0f0;
-    padding: 5px;
-    border-radius: 0 4px 4px 4px;
-    white-space: normal;
-    overflow-wrap: break-word;
+  font-size: 12px;
+  color: #888;
+  background-color: #f0f0f0;
+  padding: 5px;
+  border-radius: 0 4px 4px 4px;
+  white-space: normal;
+  overflow-wrap: break-word;
 }
 
 .theme-dark .custompages-title-badge-label,
 .theme-dark .custompage-url {
-    background-color: #2b2c31;
+  background-color: #2b2c31;
 }
 
 .custompages-footer {
-    position: sticky;
-    bottom: 30px;
-    width: 100%;
+  position: sticky;
+  bottom: 30px;
+  width: 100%;
 }
 
 #id_pagename {
-    font-size: 1.5rem;
-    font-weight: 700;
+  font-size: 1.5rem;
+  font-weight: 700;
 }

@@ -24,7 +24,7 @@
  */
 
 // Include the main configuration file for Moodle.
-require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
+require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
 // Include the library file for local pages functionality.
 require_once($CFG->dirroot . '/local/page/lib.php');
 

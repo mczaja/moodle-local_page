@@ -15,7 +15,10 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Local pages plugin
+ * Local pages plugin - Core library functions
+ *
+ * This file contains the core functions used by the local_page plugin
+ * for handling file serving, navigation menu building, and metadata generation.
  *
  * @package     local_page
  * @author      Marcin Czaja RoseaThemes
@@ -23,103 +26,123 @@
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
- defined('MOODLE_INTERNAL') || die();
- 
+defined('MOODLE_INTERNAL') || die();
+
 /**
- * This function handles the retrieval and delivery of saved files for the local page plugin.
- * It checks the requested file area and serves the appropriate file to the user, 
- * ensuring proper session management and handling of download requests.
+ * Retrieves and serves saved files associated with a specific page.
  *
- * @param mixed $course Course object
- * @param mixed $birecordorcm Course module object
- * @param mixed $context Context object
- * @param mixed $filearea File area string
- * @param mixed $args Arguments
- * @param bool $forcedownload Force download flag
- * @param array $options Additional options
+ * This function handles file requests for different file areas, such as
+ * page content and Open Graph images. It checks the requested file area
+ * and retrieves the corresponding file from the file storage.
+ *
+ * @param mixed $course Course object, representing the course context.
+ * @param mixed $birecordorcm Course module object, used for module-specific operations.
+ * @param mixed $context Context object, providing context for file access.
+ * @param mixed $filearea String indicating the area of the file (e.g., 'pagecontent' or 'ogimage').
+ * @param mixed $args Array of arguments used to locate the file within the specified file area.
+ * @param bool $forcedownload Flag indicating whether to force the file download.
+ * @param array $options Additional options for file serving, such as caching settings.
  * @return void
  */
-function local_page_pluginfile($course, $birecordorcm, $context, $filearea, $args, $forcedownload, array $options = []) {
-    // Get the file storage API
-    $fs = get_file_storage();
+function local_page_pluginfile($course, $birecordorcm, $context, $filearea, $args, $forcedownload, array $options = array()) {
+    $fs = get_file_storage(); // Get the file storage instance.
 
-    // Extract the filename from the end of the args array
-    $filename = array_pop($args);
-    // Construct the filepath from remaining args or use root path
-    $filepath = $args ? '/' . implode('/', $args) . '/' : '/';
+    $filename = array_pop($args); // Extract the filename from the arguments.
+    $filepath = $args ? '/' . implode('/', $args) . '/' : '/'; // Construct the file path from the remaining arguments.
 
+    // Check if the requested file area is for page content.
     if ($filearea === 'pagecontent') {
-        // Handle files in the pagecontent area
-        if (!$file = $fs->get_file($context->id, 'local_page', 'pagecontent', 0, $filepath, $filename) || $file->is_directory()) {
-            // If file doesn't exist or is a directory, return 404
-            send_file_not_found();
+        // Attempt to retrieve the file; if not found or if it's a directory, trigger a 404 error.
+        if (!$file = $fs->get_file($context->id, 'local_page', 'pagecontent', 0, $filepath, $filename) or $file->is_directory()) {
+            send_file_not_found(); // Send a 404 response if the file is not found.
         }
-    } else if ($filearea === 'ogimage') {
-        // Handle files in the ogimage area (Open Graph images for social media)
-        $itemid = array_pop($args);
-        // Get the file with the specific item ID
+    } 
+    // Check if the requested file area is for Open Graph images.
+    else if ($filearea === 'ogimage') {
+        $itemid = array_pop($args); // Extract the item ID for the Open Graph image.
+        // Retrieve the Open Graph image file from storage.
         $file = $fs->get_file($context->id, 'local_page', $filearea, $itemid, '/', $filename);
-        // Todo: Maybe put in fall back image.
     }
 
-    // Close the session before sending the file to prevent session lock issues
-    \core\session\manager::write_close();
-    // Send the file to the browser
-    send_stored_file($file, null, 0, $forcedownload, $options);
+    \core\session\manager::write_close(); // Close the session to prevent locking issues.
+    send_stored_file($file, null, 0, $forcedownload, $options); // Serve the requested file to the user.
 }
-
 /**
- * Build the menu for the page
+ * Builds the navigation menu for custom pages.
  *
- * @param navigation_node $nav Navigation node
- * @param mixed $parent Parent ID
- * @param global_navigation $gnav Global navigation object
- * @throws coding_exception
- * @throws dml_exception
- * @throws moodle_exception
+ * Retrieves all active custom pages that should appear in the menu
+ * and adds them to the navigation structure.
+ *
+ * @param navigation_node $nav The navigation node to add menu items to
+ * @param global_navigation $gnav The global navigation object
+ * @throws coding_exception If there's an issue with string formatting
+ * @throws dml_exception If there's a database error
+ * @throws moodle_exception For other Moodle-related exceptions
  */
 function local_page_build_menu(navigation_node $nav, global_navigation $gnav) {
     global $DB;
+    
+    // Get current timestamp to filter pages by date.
     $today = date('U');
+    
+    // Retrieve all non-deleted pages that should appear in the menu and are published (date <= now).
     $records = $DB->get_records_sql("SELECT * FROM {local_page} WHERE deleted=0 AND onmenu=1 " .
         " AND pagedate <=? " .
         "ORDER BY pagename", [$today]);
-    local_page_process_records($records, $nav, false, $gnav);
+        
+    // Process the retrieved records to build the menu.
+    local_page_process_records($records, $nav, $gnav);
 }
 
 /**
- * Process records for pages
+ * Processes page records to build navigation menu items.
  *
- * @param mixed $records Database records
- * @param mixed $nav Navigation node
- * @param global_navigation $gnav Global navigation object
- * @param bool|object $parent Parent object or false
- * @throws coding_exception
- * @throws dml_exception
- * @throws moodle_exception
+ * For each page record, checks access permissions and creates
+ * appropriate navigation links based on the page configuration.
+ *
+ * @param array $records Database records of pages to process
+ * @param navigation_node $nav The navigation node to add items to
+ * @param global_navigation $gnav The global navigation object
+ * @param bool|object $parent Parent object or false if no parent
+ * @throws coding_exception If there's an issue with string formatting
+ * @throws dml_exception If there's a database error
+ * @throws moodle_exception For other Moodle-related exceptions
  */
 function local_page_process_records($records, $nav, global_navigation $gnav, $parent = false) {
     global $CFG;
+    
     if ($records) {
         foreach ($records as $page) {
+            // Default access is granted.
             $canaccess = true;
+            
+            // Check access level restrictions if defined.
             if (isset($page->accesslevel) && stripos($page->accesslevel, ":") !== false) {
                 $canaccess = false;
                 $levels = explode(",", $page->accesslevel);
                 $context = context_system::instance();
+                
+                // Process each capability in the access level list.
                 foreach ($levels as $level) {
                     if ($canaccess != true) {
                         if (stripos($level, "!") !== false) {
+                            // Negated capability check (user must NOT have this capability).
                             $level = str_replace("!", "", $level);
                             $canaccess = has_capability(trim($level), $context) ? false : true;
                         } else {
+                            // Standard capability check (user must have this capability).
                             $canaccess = has_capability(trim($level), $context) ? true : false;
                         }
                     }
                 }
             }
+            
+            // If user has access, create the navigation URL.
             if ($canaccess) {
+                // Default URL with page ID parameter.
                 $urllocation = new moodle_url('/local/page/', ['id' => $page->id]);
+                
+                // Use clean URL if enabled and page has a menu name.
                 if (get_config('local_page', 'cleanurl_enabled') && trim($page->menuname) != '') {
                     $urllocation = new moodle_url('/local/page/' . $page->menuname);
                 }
@@ -129,9 +152,12 @@ function local_page_process_records($records, $nav, global_navigation $gnav, $pa
 }
 
 /**
- * Callback for the core\hook\output\before_standard_head_html_generation hook.
+ * Adds custom metadata to the HTML head for local pages.
  *
- * @param \core\hook\output\before_standard_head_html_generation $hook
+ * This function is called by the before_standard_head_html_generation hook
+ * and adds Open Graph metadata and other custom meta tags to local pages.
+ *
+ * @param \core\hook\output\before_standard_head_html_generation $hook The hook object
  * @return void
  */
 function local_page_output_before_standard_head_html_generation(
@@ -139,25 +165,26 @@ function local_page_output_before_standard_head_html_generation(
 ): void {
     global $CFG, $DB, $PAGE, $SITE;
 
-    // Only apply to local pages.
+    // Only apply to local pages - check the page type.
     if ($PAGE->pagetype !== 'local-pages-index') {
         return;
     }
 
-    // Get the page ID and load the custom page.
+    // Get the page ID from URL parameters and load the custom page object.
     $pageid = optional_param('id', 0, PARAM_INT);
     $custompage = \local_page\custompage::load($pageid);
 
-    // Initialize output with custom meta tags if enabled.
+    // Initialize output with custom meta tags if enabled in settings.
     $output = get_config('local_page', 'additionalhead') ? $custompage->meta : '';
 
-    // Add Open Graph image if available.
+    // Add Open Graph image if available for this page.
     $query = "SELECT * FROM {files}
               WHERE component = 'local_page'
               AND filearea = 'ogimage'
               AND itemid = ?
               AND filesize > 0";
 
+    // If an OG image exists for this page, add it to the metadata.
     if ($filerecord = $DB->get_record_sql($query, [$custompage->id])) {
         $src = $CFG->wwwroot . '/pluginfile.php/1/local_page/ogimage/' .
             $custompage->id . '/' . $filerecord->filename;
@@ -168,14 +195,16 @@ function local_page_output_before_standard_head_html_generation(
     $url = new moodle_url($PAGE->url);
     $url->remove_all_params();
 
+    // Use clean URL format if enabled and no specific page ID is requested.
     if (get_config('local_page', 'cleanurl_enabled') && $pageid === 0) {
         $url = str_replace('index.php', '', $url->out());
         $url .= $custompage->menuname;
     } else {
+        // Otherwise use standard URL format with ID parameter.
         $url = $url->out() . '?id=' . $custompage->id;
     }
 
-    // Add standard Open Graph metadata.
+    // Add standard Open Graph metadata for social media sharing.
     $output .= "\n" . '    <meta property="og:site_name" content="' . format_string($SITE->fullname) . '" />';
     $output .= "\n" . '    <meta property="og:type" content="website" />';
     $output .= "\n" . '    <meta property="og:title" content="' . format_string($PAGE->title) . '" />';

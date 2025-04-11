@@ -91,8 +91,7 @@ class local_page_renderer extends plugin_renderer_base {
         }
 
         $html .= html_writer::tag('h5', shorten_text($name, 100), ['class' => 'custompages-title font-weight-medium']);
-        
-        // Edit button  .
+        // Edit button.
         $editurl = new moodle_url($CFG->wwwroot . '/local/page/edit.php', ['id' => $parent]);
         $html .= html_writer::start_div('w-100 border-bottom mb-2 pb-2');
         $html .= html_writer::link($editurl, get_string('edit', 'moodle'), ['class' => 'm-0 btn btn-secondary w-100']);
@@ -274,16 +273,16 @@ class local_page_renderer extends plugin_renderer_base {
         // Check if the user has access to the page and if the page date is valid or if the user is a site admin.
         // Check if user has access based on time constraints, status, permissions, or admin status.
         if ($page->pagedate > 0 && $page->enddate > 0) {
-            // Both start and end dates are set
+            // Both start and end dates are set.
             $istimevalid = $page->pagedate <= time() && $page->enddate >= time() && $page->status == 'live' && $permissions;
         } else if ($page->pagedate > 0 && $page->enddate <= 0) {
-            // Only start date is set
+            // Only start date is set.
             $istimevalid = $page->pagedate <= time() && $page->status == 'live' && $permissions;
         } else if ($page->pagedate <= 0 && $page->enddate > 0) {
-            // Only end date is set
+            // Only end date is set.
             $istimevalid = $page->enddate >= time() && $page->status == 'live' && $permissions;
         } else {
-            // No dates set, check if status is live
+            // No dates set, check if status is live.
             $istimevalid = $page->status == 'live' ? $permissions : false;
         }
         $isadmin = has_capability('moodle/site:config', $context);

@@ -25,8 +25,8 @@
 
 defined('MOODLE_INTERNAL') || die;
 
-$plugin->requires   = 2022112817;                       
-$plugin->version    = 2025041100;                       // This plugins version number.
-$plugin->release    = 'v1.0';                           // This plugins release number.
+$plugin->requires   = 2022112817;
+$plugin->version    = 2025041101;
+$plugin->release    = 'v1.0';
 $plugin->maturity   = MATURITY_STABLE;
 $plugin->component  = 'local_page';

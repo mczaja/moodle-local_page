@@ -87,9 +87,8 @@ $PAGE->set_title($custompage->pagename);
 // Get page status for admin and user.
 $statusbadge = $custompage->status;
 $PAGE->set_heading($custompage->pagename);
-// Set a custom body ID here
-$PAGE->set_pagetype('local-page-id-' . $pageid); // Optional
-
+// Set a custom body ID here.
+$PAGE->set_pagetype('local-page-id-' . $pageid); // Optional.
 
 // Add a link to the custom pages list in the navbar if the user has the necessary capability.
 if (has_capability('local/page:addpages', $context) || is_siteadmin()) {
