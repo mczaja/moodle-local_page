@@ -44,7 +44,7 @@ defined('MOODLE_INTERNAL') || die();
  * @param array $options Additional options for file serving, such as caching settings.
  * @return void
  */
-function local_page_pluginfile($course, $birecordorcm, $context, $filearea, $args, $forcedownload, array $options = array()) {
+function local_page_pluginfile($course, $birecordorcm, $context, $filearea, $args, $forcedownload, array $options = []) {
     $fs = get_file_storage(); // Get the file storage instance.
 
     $filename = array_pop($args); // Extract the filename from the arguments.
@@ -53,15 +53,17 @@ function local_page_pluginfile($course, $birecordorcm, $context, $filearea, $arg
     // Check if the requested file area is for page content.
     if ($filearea === 'pagecontent') {
         // Attempt to retrieve the file; if not found or if it's a directory, trigger a 404 error.
-        if (!$file = $fs->get_file($context->id, 'local_page', 'pagecontent', 0, $filepath, $filename) or $file->is_directory()) {
+        if (!$file = $fs->get_file($context->id, 'local_page', 'pagecontent', 0, $filepath, $filename) || $file->is_directory()) {
             send_file_not_found(); // Send a 404 response if the file is not found.
         }
-    } 
+    }
     // Check if the requested file area is for Open Graph images.
-    else if ($filearea === 'ogimage') {
+    if ($filearea === 'ogimage') {
         $itemid = array_pop($args); // Extract the item ID for the Open Graph image.
         // Retrieve the Open Graph image file from storage.
         $file = $fs->get_file($context->id, 'local_page', $filearea, $itemid, '/', $filename);
+    } else {
+        send_file_not_found(); // Send a 404 response if the file area is not recognized.
     }
 
     \core\session\manager::write_close(); // Close the session to prevent locking issues.
@@ -81,15 +83,25 @@ function local_page_pluginfile($course, $birecordorcm, $context, $filearea, $arg
  */
 function local_page_build_menu(navigation_node $nav, global_navigation $gnav) {
     global $DB;
-    
+
     // Get current timestamp to filter pages by date.
-    $today = date('U');
-    
-    // Retrieve all non-deleted pages that should appear in the menu and are published (date <= now).
-    $records = $DB->get_records_sql("SELECT * FROM {local_page} WHERE deleted=0 AND onmenu=1 " .
-        " AND pagedate <=? " .
-        "ORDER BY pagename", [$today]);
-        
+    $now = time();
+
+    // Build SQL conditions for active menu pages.
+    $conditions = [
+        'deleted = 0',
+        'onmenu = 1',
+        'pagedate <= :now',
+    ];
+
+    $sql = "SELECT *
+            FROM {local_page}
+            WHERE " . implode(' AND ', $conditions) . "
+            ORDER BY pagename";
+
+    // Retrieve all published, non-deleted pages that should appear in the menu.
+    $records = $DB->get_records_sql($sql, ['now' => $now]);
+
     // Process the retrieved records to build the menu.
     local_page_process_records($records, $nav, $gnav);
 }
@@ -110,18 +122,15 @@ function local_page_build_menu(navigation_node $nav, global_navigation $gnav) {
  */
 function local_page_process_records($records, $nav, global_navigation $gnav, $parent = false) {
     global $CFG;
-    
     if ($records) {
         foreach ($records as $page) {
             // Default access is granted.
             $canaccess = true;
-            
             // Check access level restrictions if defined.
             if (isset($page->accesslevel) && stripos($page->accesslevel, ":") !== false) {
                 $canaccess = false;
                 $levels = explode(",", $page->accesslevel);
                 $context = context_system::instance();
-                
                 // Process each capability in the access level list.
                 foreach ($levels as $level) {
                     if ($canaccess != true) {
@@ -136,12 +145,10 @@ function local_page_process_records($records, $nav, global_navigation $gnav, $pa
                     }
                 }
             }
-            
             // If user has access, create the navigation URL.
             if ($canaccess) {
                 // Default URL with page ID parameter.
                 $urllocation = new moodle_url('/local/page/', ['id' => $page->id]);
-                
                 // Use clean URL if enabled and page has a menu name.
                 if (get_config('local_page', 'cleanurl_enabled') && trim($page->menuname) != '') {
                     $urllocation = new moodle_url('/local/page/' . $page->menuname);
