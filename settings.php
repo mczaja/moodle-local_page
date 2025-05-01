@@ -67,7 +67,7 @@ if ($hassiteconfig) {
     $ADMIN->add(
         'local_page',
         new \admin_externalpage(
-            'Manage Pages',
+            get_string('managepages', 'local_page'),
             get_string('pluginsettings_managepages', $componentname),
             new \moodle_url('/local/page/pages.php'),
             'local/page:addpages'
@@ -81,7 +81,7 @@ if ($hassiteconfig) {
     $ADMIN->add(
         'local_page',
         new \admin_externalpage(
-            'Manage Pages',
+            get_string('managepages', 'local_page'),
             get_string('pluginsettings_managepages', $componentname),
             new \moodle_url('/local/page/pages.php'),
             'local/page:addpages'

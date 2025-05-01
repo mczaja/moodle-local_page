@@ -30,8 +30,8 @@
 require(__DIR__ . '/../../config.php');
 
 // Globals.
-global $CFG, $PAGE, $USER;
-require_once($CFG->dirroot.'/local/page/lib.php'); // Include the library file for local_page plugin functions.
+global $CFG, $PAGE, $USER, $DB, $SITE;
+require_once($CFG->dirroot . '/local/page/lib.php'); // Include the library file for local_page plugin functions.
 
 // Retrieve the ID of the page to be displayed from the URL parameters.
 $pageid = optional_param('id', 0, PARAM_INT);
@@ -72,6 +72,53 @@ foreach ($metatags as $name => $content) {
     }
 }
 
+// Add Open Graph image if available for this page.
+$fs = get_file_storage();
+$context = context_system::instance();
+$files = $fs->get_area_files($context->id, 'local_page', 'ogimage', $custompage->id, 'sortorder', false);
+
+if ($files) {
+    $file = reset($files); // Get the first file.
+    if (!$file->is_directory()) {
+        $imageurl = moodle_url::make_pluginfile_url(
+            $file->get_contextid(),
+            $file->get_component(),
+            $file->get_filearea(),
+            $file->get_itemid(),
+            $file->get_filepath(),
+            $file->get_filename(),
+            false // Do not force download.
+        );
+        $headseo .= '<meta property="og:image" content="' . $imageurl->out(false) . '" />' . "\n";
+    }
+}
+
+// Build the canonical URL for the page.
+// Use $PAGE->url which should be the canonical URL at this stage.
+$canonicalurl = new moodle_url($PAGE->url);
+
+// Use clean URL format if enabled and the current URL seems to be using it.
+if (get_config('local_page', 'cleanurl_enabled') && !empty($custompage->menuname)) {
+    // Check if the current URL path matches the expected clean URL pattern.
+    $pathmatch = '/' . preg_quote($custompage->menuname, '/');
+    if (preg_match("~$pathmatch/?$~", $PAGE->url->get_path())) {
+        // Assume clean URL is used, ensure no query parameters like 'id'.
+        $canonicalurl->remove_all_params();
+    } else {
+        // Fallback to ID-based URL if clean URL doesn't match current URL path.
+        $canonicalurl = new moodle_url('/local/page/index.php', ['id' => $custompage->id]);
+    }
+} else {
+    // Otherwise use standard URL format with ID parameter.
+    $canonicalurl = new moodle_url('/local/page/index.php', ['id' => $custompage->id]);
+}
+
+// Add standard Open Graph metadata for social media sharing.
+$headseo .= '<meta property="og:site_name" content="' . format_string($SITE->fullname) . '" />' . "\n";
+$headseo .= '<meta property="og:type" content="website" />' . "\n";
+$headseo .= '<meta property="og:title" content="' . format_string($PAGE->title) . '" />' . "\n";
+$headseo .= '<meta property="og:url" content="' . $canonicalurl->out(false) . '" />' . "\n";
+
 // Additional HTML head content.
 $additionalhead = $custompage->meta;
 
@@ -98,7 +145,6 @@ if (has_capability('local/page:addpages', $context) || is_siteadmin()) {
 // Add a CSS class to the body tag to uniquely identify this page.
 if ($pageid) {
     if ($pagedata = $DB->get_record('local_page', ['id' => $pageid])) {
-
         // Construct the CSS class name using the format: {pagetype}-local-pages-{pagename}-{pageid}.
         $classname = "local-page-id-{$pageid}";
 
@@ -117,11 +163,15 @@ echo $renderer->showpage($custompage); // Render and display the custom page con
 // Check if the user has the capability to add pages or is a site admin.
 if (has_capability('local/page:addpages', $context) || is_siteadmin()) {
     // Create a link to the edit page with an icon and the text 'edit'.
-    $footerbtn = html_writer::link(
-        new moodle_url('/local/page/edit.php', ['id' => $pageid]),
-        '<i class="fa fa-pencil mr-2"></i> ' . get_string('edit', 'moodle'),
-        ['class' => 'btn btn-primary']
+    $footerbtn = html_writer::div(
+        html_writer::link(
+            new moodle_url('/local/page/edit.php', ['id' => $pageid]),
+            '<i class="fa fa-pencil mr-2"></i>' . get_string('edit', 'moodle'),
+            ['class' => 'btn btn-primary']
+        ),
+        'local-page-admin-controls mt-3'
     );
+    
     // Output the footer button.
     echo $footerbtn;
 }

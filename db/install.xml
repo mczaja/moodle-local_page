@@ -25,7 +25,7 @@
             </KEYS>
             <INDEXES>
                 <INDEX NAME="deleted" UNIQUE="false" FIELDS="deleted" COMMENT="Index for deleted flag to improve query performance" />
-                <INDEX NAME="pagename" UNIQUE="false" FIELDS="pagename(255)" COMMENT="Index for page name searches" />
+                <INDEX NAME="pagename" UNIQUE="false" FIELDS="pagename" COMMENT="Index for page name searches" />
             </INDEXES>
         </TABLE>
     </TABLES>

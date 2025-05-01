@@ -33,6 +33,7 @@ $string['cleanurl_enabled'] = 'Activate Clean URLs';
 $string['cleanurl_enabled_description'] = 'Enable the use of clean URLs for links. <br />
 <strong>Note:</strong> This will replace the default link structure. For example: <strong>about-us</strong> will result in http://URL/local/page/<strong>about-us</strong><br />
 <strong>Mod_rewrite</strong> must be enabled on your server to use clean URLs.';
+$string['confirmdeletepage'] = 'Are you sure you want to delete the page \'{$a}\'?';
 $string['custompage_title'] = 'Page Management';
 $string['delete'] = "Remove";
 $string['edit'] = "Modify";
@@ -58,6 +59,8 @@ $string['label_placeholder'] = "Placeholder Text";
 $string['label_relatesto'] = "Related To";
 $string['label_remove'] = "Remove Item";
 $string['label_required'] = "Mandatory Field";
+$string['page:addpages'] = "Add Pages";
+$string['managepages'] = "Manage Pages";
 $string['menu_name'] = 'Friendly URL';
 $string['menu_name_description'] = 'Friendly URL Description';
 $string['menu_name_description_help'] = 'Provide a user-friendly URL for the page. Use only letters, numbers, and hyphens. This will replace the default link structure. For example: <strong>about-us</strong> will result in http://URL/local/page/<strong>about-us</strong>';
@@ -100,6 +103,7 @@ $string['onlyloggedin_description_help'] = "<ul>
     <li>Guest users will see a message that the page is only visible to logged in users.</li>
 </ul>";
 $string['page'] = 'Page';
+$string['page:addpages'] = 'Add Pages';
 $string['page_accesslevel'] = "Required Capability";
 $string['page_content'] = 'Content of the Page';
 $string['page_content_description'] = 'Enter the content for the page here.';
