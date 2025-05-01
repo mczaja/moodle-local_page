@@ -42,11 +42,19 @@ class local_page_renderer extends plugin_renderer_base {
     public $errorfields = [];
 
     /**
-     *
      * Get the submenu item
      *
-     * @param string $name
-     * @return string
+     * This function generates the HTML for displaying a single page card in the pages list.
+     * Each card shows the page status (live/draft/archived), title, edit button, URLs,
+     * and action buttons for viewing and deleting the page.
+     *
+     * @param int $parent The ID of the page
+     * @param string $name The name/title of the page
+     * @param string $status The current status of the page (live, draft, archived)
+     * @param int $pagedate The timestamp when the page becomes active
+     * @param int $enddate The timestamp when the page expires
+     * @param string|null $menuname Optional menu name for clean URLs
+     * @return string The generated HTML for the page card
      */
     public function get_allpages($parent, $name, $status, $pagedate, $enddate, $menuname = null): string {
         global $CFG, $USER;
@@ -246,7 +254,8 @@ class local_page_renderer extends plugin_renderer_base {
             $html .= html_writer::tag('h3', get_string('status_live', 'local_page'), ['class' => 'font-weight-medium mb-3']);
             $html .= html_writer::start_div('custompages-item mb-4');
             foreach ($livepages as $page) {
-                $html .= $this->get_allpages($page->id, $page->pagename, $page->status, $page->pagedate, $page->enddate, $page->menuname);
+                $html .= $this->get_allpages($page->id, $page->pagename,
+                    $page->status, $page->pagedate, $page->enddate, $page->menuname);
             }
             $html .= html_writer::end_div();
         }
@@ -256,7 +265,8 @@ class local_page_renderer extends plugin_renderer_base {
             $html .= html_writer::tag('h3', get_string('status_draft', 'local_page'), ['class' => 'font-weight-medium mt-6 mb-3']);
             $html .= html_writer::start_div('custompages-item mb-4');
             foreach ($draftpages as $page) {
-                $html .= $this->get_allpages($page->id, $page->pagename, $page->status, $page->pagedate, $page->enddate, $page->menuname);
+                $html .= $this->get_allpages($page->id, $page->pagename, $page->status,
+                    $page->pagedate, $page->enddate, $page->menuname);
             }
             $html .= html_writer::end_div();
         }
@@ -267,7 +277,8 @@ class local_page_renderer extends plugin_renderer_base {
                 ['class' => 'font-weight-medium mt-6 mb-3']);
             $html .= html_writer::start_div('custompages-item mb-4');
             foreach ($archivedpages as $page) {
-                $html .= $this->get_allpages($page->id, $page->pagename, $page->status, $page->pagedate, $page->enddate, $page->menuname);
+                $html .= $this->get_allpages($page->id, $page->pagename, $page->status,
+                    $page->pagedate, $page->enddate, $page->menuname);
             }
             $html .= html_writer::end_div();
         }
