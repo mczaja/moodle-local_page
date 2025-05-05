@@ -59,7 +59,6 @@ $string['label_placeholder'] = "Placeholder Text";
 $string['label_relatesto'] = "Related To";
 $string['label_remove'] = "Remove Item";
 $string['label_required'] = "Mandatory Field";
-$string['page:addpages'] = "Add Pages";
 $string['managepages'] = "Manage Pages";
 $string['menu_name'] = 'Friendly URL';
 $string['menu_name_description'] = 'Friendly URL Description';

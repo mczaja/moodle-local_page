@@ -143,50 +143,46 @@ class local_page_renderer extends plugin_renderer_base {
                 'class' => 'm-0 btn btn-danger w-100',
                 'data-toggle' => 'modal',
                 'data-target' => '#deleteConfirmModal' . $parent,
-                'role' => 'button'
+                'role' => 'button',
             ]
         );
-        
-        // Modal confirmation window
+
+        // Modal confirmation window.
         $html .= html_writer::start_tag('div', [
             'class' => 'modal fade',
             'id' => 'deleteConfirmModal' . $parent,
             'tabindex' => '-1',
             'role' => 'dialog',
             'aria-labelledby' => 'deleteConfirmModalLabel' . $parent,
-            'aria-hidden' => 'true'
+            'aria-hidden' => 'true',
         ]);
         $html .= html_writer::start_tag('div', ['class' => 'modal-dialog', 'role' => 'document']);
         $html .= html_writer::start_tag('div', ['class' => 'modal-content']);
-        
-        // Modal header
+        // Modal header.
         $html .= html_writer::start_tag('div', ['class' => 'modal-header']);
         $html .= html_writer::tag('h5', get_string('delete', 'local_page'), [
             'class' => 'modal-title',
-            'id' => 'deleteConfirmModalLabel' . $parent
+            'id' => 'deleteConfirmModalLabel' . $parent,
         ]);
         $html .= html_writer::start_tag('button', [
             'type' => 'button',
             'class' => 'close',
             'data-dismiss' => 'modal',
-            'aria-label' => get_string('close', 'admin')
+            'aria-label' => get_string('close', 'admin'),
         ]);
         $html .= html_writer::tag('span', '&times;', ['aria-hidden' => 'true']);
         $html .= html_writer::end_tag('button');
         $html .= html_writer::end_tag('div');
-        
-        // Modal body
+        // Modal body.
         $html .= html_writer::start_tag('div', ['class' => 'modal-body']);
-
         $html .= html_writer::tag('p', get_string('confirmdeletepage', 'local_page', $name));
         $html .= html_writer::end_tag('div');
-        
-        // Modal footer
+        // Modal footer.
         $html .= html_writer::start_tag('div', ['class' => 'modal-footer']);
         $html .= html_writer::tag('button', get_string('cancel', 'moodle'), [
             'type' => 'button',
             'class' => 'btn btn-link col text-center',
-            'data-dismiss' => 'modal'
+            'data-dismiss' => 'modal',
         ]);
         $html .= html_writer::link(
             $deleteurl,
@@ -194,7 +190,6 @@ class local_page_renderer extends plugin_renderer_base {
             ['class' => 'btn btn-danger col']
         );
         $html .= html_writer::end_tag('div');
-        
         $html .= html_writer::end_tag('div');
         $html .= html_writer::end_tag('div');
         $html .= html_writer::end_tag('div');

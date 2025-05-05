@@ -171,7 +171,6 @@ if (has_capability('local/page:addpages', $context) || is_siteadmin()) {
         ),
         'local-page-admin-controls mt-3'
     );
-    
     // Output the footer button.
     echo $footerbtn;
 }
