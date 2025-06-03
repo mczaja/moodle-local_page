@@ -61,14 +61,14 @@ class pages_list implements renderable, templatable {
         global $CFG;
 
         $data = new stdClass();
-        
-        // Group pages by status
+
+        // Group pages by status.
         $livepages = [];
         $draftpages = [];
         $archivedpages = [];
 
         foreach ($this->pages as $page) {
-            // Create page card data for each page
+            // Create page card data for each page.
             $pagecard = new page_card(
                 $page->id,
                 $page->pagename,
@@ -79,7 +79,7 @@ class pages_list implements renderable, templatable {
             );
             $pagecarddata = $pagecard->export_for_template($output);
 
-            // Group by status
+            // Group by status.
             if ($page->status == 'live') {
                 $livepages[] = $pagecarddata;
             } else if ($page->status == 'draft') {
@@ -89,14 +89,14 @@ class pages_list implements renderable, templatable {
             }
         }
 
-        // Assign grouped pages to data object
+        // Assign grouped pages to data object.
         $data->livepages = $livepages;
         $data->draftpages = $draftpages;
         $data->archivedpages = $archivedpages;
 
-        // Add page URL
+        // Add page URL.
         $data->addpageurl = new moodle_url($CFG->wwwroot . '/local/page/edit.php');
 
         return $data;
     }
-} 
+}

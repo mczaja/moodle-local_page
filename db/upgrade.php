@@ -24,8 +24,6 @@
  */
 
 
-defined('MOODLE_INTERNAL') || die;
-
 /**
  *
  * This is to upgrade the older versions of the plugin.

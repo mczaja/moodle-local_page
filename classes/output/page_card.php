@@ -75,7 +75,6 @@ class page_card implements renderable, templatable {
         $this->enddate = $enddate;
         $this->menuname = $menuname;
     }
-
     /**
      * Export data for template
      *
@@ -90,7 +89,7 @@ class page_card implements renderable, templatable {
         $data->name = shorten_text($this->name, 100);
         $data->status = $this->status;
 
-        // Generate card body class based on status
+        // Generate card body class based on status.
         $data->cardbodyclass = 'custompages-card-body rounded mb-3';
         if ($this->status === 'draft') {
             $data->cardbodyclass .= ' custompages-card-body--draft';
@@ -98,13 +97,12 @@ class page_card implements renderable, templatable {
             $data->cardbodyclass .= ' custompages-card-body--archived';
         }
 
-        // Generate status badge
+        // Generate status badge.
         $badgeclasses = [
             'live' => 'badge badge-sq badge-success',
             'draft' => 'badge badge-sq badge-warning',
             'archived' => 'badge badge-sq badge-danger',
         ];
-        
         if (isset($badgeclasses[$this->status])) {
             $statusstring = get_string('status_' . $this->status, 'local_page');
             $data->statusbadge = \html_writer::tag('span', $statusstring, ['class' => $badgeclasses[$this->status]]);
@@ -112,7 +110,7 @@ class page_card implements renderable, templatable {
             $data->statusbadge = '';
         }
 
-        // Check if page has restrictions
+        // Check if page has restrictions.
         $data->restricted = false;
         if ($this->pagedate > 0 && $this->status === 'live' && $this->pagedate > time()) {
             $data->restricted = true;
@@ -122,7 +120,7 @@ class page_card implements renderable, templatable {
             $data->restricted = true;
         }
 
-        // Generate URLs
+        // Generate URLs.
         $data->editurl = new moodle_url($CFG->wwwroot . '/local/page/edit.php', ['id' => $this->id]);
         $data->pageurl = $CFG->wwwroot . '/local/page/?id=' . $this->id;
         $data->viewurl = new moodle_url($CFG->wwwroot . '/local/page/', ['id' => $this->id]);
@@ -131,7 +129,7 @@ class page_card implements renderable, templatable {
             ['pagedel' => $this->id, 'sesskey' => $USER->sesskey]
         );
 
-        // Add friendly URL if menuname exists
+        // Add friendly URL if menuname exists.
         if ($this->menuname) {
             $data->menuname = $this->menuname;
             $data->friendlyurl = $CFG->wwwroot . '/local/page/' . $this->menuname;
@@ -139,4 +137,4 @@ class page_card implements renderable, templatable {
 
         return $data;
     }
-} 
+}

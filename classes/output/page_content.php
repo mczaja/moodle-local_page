@@ -74,4 +74,4 @@ class page_content implements renderable, templatable {
 
         return $data;
     }
-} 
+}

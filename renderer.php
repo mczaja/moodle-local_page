@@ -27,7 +27,7 @@ defined('MOODLE_INTERNAL') || die;
 
 require_once($CFG->dirroot . '/local/page/forms/edit.php');
 
-// Temporary fix: manually include output classes until cache is cleared
+// Temporary fix: manually include output classes until cache is cleared.
 require_once($CFG->dirroot . '/local/page/classes/output/page_card.php');
 require_once($CFG->dirroot . '/local/page/classes/output/pages_list.php');
 require_once($CFG->dirroot . '/local/page/classes/output/page_content.php');
@@ -190,7 +190,6 @@ class local_page_renderer extends plugin_renderer_base {
 
             // Replace placeholders in the page content with the actual form content.
             $content = str_replace(["#form#", "{form}"], [$form, $form], $pagecontent);
-            
             $pagecontentobj = new page_content(true, $content);
             return $this->render_page_content($pagecontentobj);
         } else {
