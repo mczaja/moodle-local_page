@@ -1,0 +1,130 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template local_page/page_card
+
+    Template for displaying a single page card in the pages list.
+
+    Context variables required for this template:
+    * id - Page ID
+    * name - Page name/title
+    * status - Page status (live, draft, archived)
+    * statusbadge - HTML for status badge
+    * cardbodyclass - CSS classes for card body
+    * restricted - Boolean if page has date restrictions
+    * editurl - URL for edit page
+    * pageurl - Standard page URL
+    * menuname - Menu name for friendly URL (optional)
+    * friendlyurl - Friendly URL (optional)
+    * viewurl - URL to view page
+    * deleteurl - URL to delete page
+    * sesskey - Session key for delete operation
+
+    Example context (json):
+    {
+        "id": 123,
+        "name": "Sample Page",
+        "status": "live",
+        "statusbadge": "<span class='badge badge-sq badge-success'>Live</span>",
+        "cardbodyclass": "custompages-card-body rounded mb-3",
+        "restricted": false,
+        "editurl": "/local/page/edit.php?id=123",
+        "pageurl": "/local/page/?id=123",
+        "menuname": "sample-page",
+        "friendlyurl": "/local/page/sample-page",
+        "viewurl": "/local/page/?id=123",
+        "deleteurl": "/local/page/pages.php?pagedel=123&sesskey=abc123"
+    }
+}}
+<div class="custompages-card rounded">
+    <div class="{{{cardbodyclass}}}">
+        {{! Status badge and restrictions }}
+        <div class="custompages-title-badge d-inline-block me-2 mb-2">
+            {{{statusbadge}}}
+        </div>
+        {{#restricted}}
+            <span class="badge badge-sq badge-warning">{{#str}}restricted, local_page{{/str}}</span>
+        {{/restricted}}
+
+        {{! Page title }}
+        <h5 class="custompages-title font-weight-medium">{{name}}</h5>
+
+        {{! Edit button }}
+        <div class="w-100 border-bottom mb-2 pb-2">
+            <a href="{{{editurl}}}" class="m-0 btn btn-secondary w-100">{{#str}}edit, moodle{{/str}}</a>
+        </div>
+
+        {{! Standard URL }}
+        <label class="custompages-title-badge-label">{{#str}}url, moodle{{/str}}</label>
+        <pre class="custompage-url mb-2">{{{pageurl}}}</pre>
+
+        {{! Friendly URL if menuname exists }}
+        {{#menuname}}
+            <label class="custompages-title-badge-label">{{#str}}menu_name, local_page{{/str}}</label>
+            <pre class="custompage-url mb-2">{{{friendlyurl}}}</pre>
+        {{/menuname}}
+
+        {{! Action buttons }}
+        <div class="custompages-btn-group" role="group">
+            <div class="row w-100 no-gutters mt-2 border-top pt-3">
+                {{! View button }}
+                <div class="col me-2">
+                    <a href="{{{viewurl}}}" target="_blank" class="m-0 btn btn-info w-100">
+                        <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                    </a>
+                </div>
+                {{! Delete button }}
+                <div class="col ms-2">
+                    <a href="#" class="m-0 btn btn-danger w-100" 
+                       data-toggle="modal" 
+                       data-target="#deleteConfirmModal{{id}}" 
+                       role="button">
+                        <i class="fa fa-trash"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        {{! Delete confirmation modal }}
+        <div class="modal fade" id="deleteConfirmModal{{id}}" tabindex="-1" role="dialog" 
+             aria-labelledby="deleteConfirmModalLabel{{id}}" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="deleteConfirmModalLabel{{id}}">
+                            {{#str}}delete, local_page{{/str}}
+                        </h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="{{#str}}close, admin{{/str}}">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <p>{{#str}}confirmdeletepage, local_page, {{name}}{{/str}}</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-link col text-center" data-dismiss="modal">
+                            {{#str}}cancel, moodle{{/str}}
+                        </button>
+                        <a href="{{{deleteurl}}}" class="btn btn-danger col">
+                            <i class="fa fa-trash me-1"></i> {{#str}}delete, local_page{{/str}}
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div> 

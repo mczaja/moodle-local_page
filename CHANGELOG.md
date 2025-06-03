@@ -4,6 +4,14 @@
 ### Added:
  - Added option to hide the title of the page
 
+### Improved:
+ - Improved the way the page content is rendered
+ - Improved the way the page card is rendered
+ - Improved the way the pages list is rendered
+ - Improved the way the page content is rendered
+ - Improved the way the page card is rendered
+ - Improved the way the pages list is rendered
+ 
 ### Fixed
 - Missing language string for capability definition
 
