@@ -162,6 +162,12 @@ class pages_edit_product_form extends moodleform {
         $mform->addElement('textarea', 'pagename', get_string('title', 'h5p'), ['placeholder' => 'Enter page name']);
         $mform->setType('pagename', PARAM_TEXT); // Set the type for the page name.
 
+        // Select Hide Title.
+        $mform->addElement('select', 'hidetitle', get_string('hidetitle', 'local_page'),
+        ['no' => 'No', 'yes' => 'Yes']);
+        $mform->setDefault('hidetitle', 'no');
+        $mform->setType('hidetitle', PARAM_TEXT); // Set the type for the hidetitle field.
+
         // Date selector for the page date.
         $mform->addElement(
             'date_time_selector',

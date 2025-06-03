@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## [1.0.2] - 2025-06-03
+### Added:
+ - Added option to hide the title of the page
+
+### Fixed
+- Missing language string for capability definition
+
 ## [1.0.1] - 2025-04-30
 ### Added:
  - Added modal confirmation dialog when deleting pages to prevent accidental deletion
