@@ -30,11 +30,8 @@
  * Retrieves and serves saved files associated with a specific page.
  *
  * This function handles file requests for different file areas, such as
- * page content, Open Graph images, and H5P files. It checks the requested file area
+ * page content, Open Graph images. It checks the requested file area
  * and retrieves the corresponding file from the file storage.
- * 
- * H5P files (.h5p) can be stored in the 'pagecontent' file area and will be
- * served through Moodle's core H5P embed system at /h5p/embed.php
  *
  * @param stdClass $course Course object, representing the course context.
  * @param stdClass $birecordorcm Course module object, used for module-specific operations.
@@ -63,28 +60,28 @@ function local_page_pluginfile($course, $birecordorcm, $context, $filearea, $arg
 
     // Extract the filename from the arguments.
     $filename = array_pop($args);
-    
+
     // Handle different file areas.
     $file = false;
-    
+
     if ($filearea === 'pagecontent') {
         // Construct the file path from the remaining arguments.
         $filepath = $args ? '/' . implode('/', $args) . '/' : '/';
-        
+
         // Attempt to retrieve the file from the pagecontent area.
         $file = $fs->get_file($context->id, 'local_page', 'pagecontent', 0, $filepath, $filename);
-        
+
         // Special handling for H5P files - integrate with Moodle's H5P system
-        // This allows H5P content uploaded to pages to be properly displayed 
-        // through Moodle's core H5P embed functionality
+        // This allows H5P content uploaded to pages to be properly displayed
+        // through Moodle's core H5P embed functionality.
         if ($file && !$file->is_directory() && pathinfo($filename, PATHINFO_EXTENSION) === 'h5p') {
             // Close the session to prevent locking issues.
             \core\session\manager::write_close();
-            
-            // Get the file hash for H5P embed URL
+
+            // Get the file hash for H5P embed URL.
             $filehash = $file->get_contenthash();
-            
-            // Redirect to Moodle's H5P embed system
+
+            // Redirect to Moodle's H5P embed system.
             $embedurl = new moodle_url('/h5p/embed.php', [
                 'url' => moodle_url::make_pluginfile_url(
                     $context->id,
@@ -93,20 +90,19 @@ function local_page_pluginfile($course, $birecordorcm, $context, $filearea, $arg
                     0,
                     $filepath,
                     $filename
-                )->out(false)
+                )->out(false),
             ]);
-            
+
             redirect($embedurl);
             return true;
         }
-        
     } else if ($filearea === 'ogimage') {
         // For ogimage, we expect the itemid to be in the args.
         $itemid = array_shift($args); // Get the item ID for the Open Graph image.
-        
+
         // Construct the file path (ogimages are typically stored in root path).
         $filepath = '/';
-        
+
         // Retrieve the Open Graph image file from storage.
         $file = $fs->get_file($context->id, 'local_page', 'ogimage', $itemid, $filepath, $filename);
     }
@@ -118,7 +114,7 @@ function local_page_pluginfile($course, $birecordorcm, $context, $filearea, $arg
 
     // Close the session to prevent locking issues.
     \core\session\manager::write_close();
-    
+
     // Serve the requested file to the user.
     send_stored_file($file, null, 0, $forcedownload, $options);
 }
