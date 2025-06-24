@@ -1,136 +1,167 @@
 /* Grid layout for custom page items */
 .custompages-item {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-  gap: 16px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 16px;
 }
 
 /* Base styles for custom page cards */
 .custompages-card-body {
-  border: 1px solid #e0e0e0;
-  border-bottom-width: 3px; /* Emphasized bottom border */
-  padding: 16px;
-  transition: opacity 0.2s ease-in-out; /* Smooth transition for hover effects */
+    border: 1px solid #e0e0e0;
+    border-bottom-width: 3px;
+    /* Emphasized bottom border */
+    padding: 16px;
+    transition: opacity 0.2s ease-in-out;
+    /* Smooth transition for hover effects */
 }
 
 /* Modifier for draft status cards */
 .custompages-card-body--draft {
-  border-width: 2px; /* Consistent border width */
-  border-style: dashed;
+    border-width: 2px;
+    /* Consistent border width */
+    border-style: dashed;
 }
 
 /* Modifier for archived status cards */
 .custompages-card-body--archived {
-  border-width: 2px; /* Consistent border width */
-  border-style: dashed;
-  border-color: #e0e0e0; /* Ensure border color consistency */
-  opacity: 0.7;
+    border-width: 2px;
+    /* Consistent border width */
+    border-style: dashed;
+    border-color: #e0e0e0;
+    /* Ensure border color consistency */
+    opacity: 0.7;
 }
 
 .custompages-card-body--archived:hover {
-  opacity: 1; /* Increase visibility on hover */
+    opacity: 1;
+    /* Increase visibility on hover */
 }
 
 /* Dark theme adjustments for card borders */
 /* Note: This rule might be redundant if the base dark theme border color is already #e0e0e0 */
 .theme-dark .custompages-card-body {
-  border-color: #e0e0e0;
+    border-color: #e0e0e0;
 }
 
 /* Styles for the title within a card */
 .custompages-title {
-  margin: 16px 0;
-  font-size: 16px;
+    margin: 16px 0;
+    font-size: 16px;
 }
 
 /* Button group layout within cards */
 .custompages-btn-group {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px; /* Spacing between buttons */
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    /* Spacing between buttons */
 }
 
 /* Ensure buttons within the group stack nicely */
 .custompages-btn-group .btn {
-  flex-grow: 1; /* Allow buttons to grow */
-  /* display: block; width: 100%; might be too restrictive depending on desired layout */
+    flex-grow: 1;
+    /* Allow buttons to grow */
+    /* display: block; width: 100%; might be too restrictive depending on desired layout */
 }
 
 /* Common styles for page status badges (applied via ::before on heading) */
 .local-page-status-draft h1.page-header-headings::before,
 .local-page-status-live h1.page-header-headings::before,
 .local-page-status-archived h1.page-header-headings::before {
-  display: inline-block; /* Display as an inline block element */
-  margin-bottom: 10px;
-  padding: 4px 8px;
-  border-radius: 4px;
-  font-size: 12px;
-  font-weight: bold;
-  color: #515151; /* Consider using theme text color variables */
-  position: absolute; /* Position relative to the heading's container */
-  top: -40px; /* Adjust positioning as needed */
-  /* Ensure the parent element has position: relative if needed */
+    display: inline-block;
+    /* Display as an inline block element */
+    margin-bottom: 10px;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: bold;
+    color: #515151;
+    /* Consider using theme text color variables */
+    position: absolute;
+    /* Position relative to the heading's container */
+    top: -40px;
+    /* Adjust positioning as needed */
+    /* Ensure the parent element has position: relative if needed */
 }
 
 /* Specific styles for 'Live' status badge */
 .local-page-status-live h1.page-header-headings::before {
-  content: "Live";
-  background-color: #bfe7bf; /* Consider theme success color */
+    content: "Live";
+    background-color: #bfe7bf;
+    /* Consider theme success color */
 }
 
 /* Specific styles for 'Draft' status badge */
 .local-page-status-draft h1.page-header-headings::before {
-  content: "Draft";
-  background-color: moccasin; /* Consider theme warning/info color */
+    content: "Draft";
+    background-color: moccasin;
+    /* Consider theme warning/info color */
 }
 
 /* Specific styles for 'Archived' status badge */
 .local-page-status-archived h1.page-header-headings::before {
-  content: "Archived";
-  background-color: #e7baba; /* Consider theme muted/error color */
+    content: "Archived";
+    background-color: #e7baba;
+    /* Consider theme muted/error color */
 }
 
 /* Styles for the small label above the URL */
 .custompages-title-badge-label {
-  display: block; /* Ensure it takes its own line */
-  font-size: 11px;
-  padding: 2px 6px;
-  margin: 0;
-  background-color: #f0f0f0; /* Consider theme UI background color */
-  border-radius: 4px 4px 0 0; /* Rounded top corners */
+    display: block;
+    /* Ensure it takes its own line */
+    font-size: 11px;
+    padding: 2px 6px;
+    margin: 0;
+    background-color: #f0f0f0;
+    /* Consider theme UI background color */
+    border-radius: 4px 4px 0 0;
+    /* Rounded top corners */
 }
 
 /* Styles for displaying the custom page URL */
 .custompage-url {
-  display: block; /* Ensure it takes its own line */
-  font-size: 12px;
-  color: #888; /* Consider theme muted text color */
-  background-color: #f0f0f0; /* Match the label background */
-  padding: 5px;
-  border-radius: 0 4px 4px 4px; /* Rounded bottom/right corners */
-  white-space: normal; /* Allow wrapping */
-  overflow-wrap: break-word; /* Break long URLs */
-  word-break: break-all; /* Ensure breaks even without spaces */
+    display: block;
+    /* Ensure it takes its own line */
+    font-size: 12px;
+    color: #888;
+    /* Consider theme muted text color */
+    background-color: #f0f0f0;
+    /* Match the label background */
+    padding: 5px;
+    border-radius: 0 4px 4px 4px;
+    /* Rounded bottom/right corners */
+    white-space: normal;
+    /* Allow wrapping */
+    overflow-wrap: break-word;
+    /* Break long URLs */
+    word-break: break-all;
+    /* Ensure breaks even without spaces */
 }
 
 /* Dark theme adjustments for badge label and URL background */
 .theme-dark .custompages-title-badge-label,
 .theme-dark .custompage-url {
-  background-color: #2b2c31; /* Consider dark theme UI background variable */
-  color: #ccc; /* Adjust text color for dark background if needed */
+    background-color: #2b2c31;
+    /* Consider dark theme UI background variable */
+    color: #ccc;
+    /* Adjust text color for dark background if needed */
 }
 
 /* Styles for a potentially sticky footer element */
 .custompages-footer {
-  position: sticky;
-  bottom: 30px; /* Stick 30px from the bottom */
-  width: 100%;
-  z-index: 10; /* Ensure it stays above other content if needed */
+    position: sticky;
+    bottom: 30px;
+    /* Stick 30px from the bottom */
+    width: 100%;
+    z-index: 10;
+    /* Ensure it stays above other content if needed */
 }
 
 /* Styles for the page name input field (likely on an edit form) */
 /* Using IDs for styling is generally discouraged; prefer classes if possible. */
 #id_pagename {
-  font-size: 1.5rem; /* Larger font size for emphasis */
-  font-weight: 700; /* Bold weight */
+    font-size: 1.5rem;
+    /* Larger font size for emphasis */
+    font-weight: 700;
+    /* Bold weight */
 }

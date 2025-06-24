@@ -1,0 +1,86 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template local_page/pages_list
+
+    Template for displaying the complete list of pages grouped by status.
+
+    Context variables required for this template:
+    * livepages - Array of live pages
+    * draftpages - Array of draft pages  
+    * archivedpages - Array of archived pages
+    * addpageurl - URL to add new page
+
+    Example context (json):
+    {
+        "livepages": [
+            {
+                "id": 1,
+                "name": "Live Page 1",
+                "status": "live",
+                ...
+            }
+        ],
+        "draftpages": [...],
+        "archivedpages": [...],
+        "addpageurl": "/local/page/edit.php"
+    }
+}}
+<div class="custompages-list-wrapper">
+    <div class="custompages-list w-100">
+        
+        {{! Live pages section }}
+        {{#livepages.0}}
+            <h3 class="font-weight-medium mb-3">{{#str}}status_live, local_page{{/str}}</h3>
+            <div class="custompages-item mb-4">
+                {{#livepages}}
+                    {{> local_page/page_card}}
+                {{/livepages}}
+            </div>
+        {{/livepages.0}}
+
+        {{! Draft pages section }}
+        {{#draftpages.0}}
+            <h3 class="font-weight-medium mt-6 mb-3">{{#str}}status_draft, local_page{{/str}}</h3>
+            <div class="custompages-item mb-4">
+                {{#draftpages}}
+                    {{> local_page/page_card}}
+                {{/draftpages}}
+            </div>
+        {{/draftpages.0}}
+
+        {{! Archived pages section }}
+        {{#archivedpages.0}}
+            <h3 class="font-weight-medium mt-6 mb-3">{{#str}}status_archived, local_page{{/str}}</h3>
+            <div class="custompages-item mb-4">
+                {{#archivedpages}}
+                    {{> local_page/page_card}}
+                {{/archivedpages}}
+            </div>
+        {{/archivedpages.0}}
+
+    </div>
+
+    {{! Add page footer }}
+    <div class="custompages-footer mt-4">
+        <div class="custompages-list-element">
+            <a href="{{{addpageurl}}}" class="custompages-add btn btn-primary">
+                {{#str}}addpage, local_page{{/str}}
+            </a>
+        </div>
+    </div>
+</div> 

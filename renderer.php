@@ -27,6 +27,15 @@ defined('MOODLE_INTERNAL') || die;
 
 require_once($CFG->dirroot . '/local/page/forms/edit.php');
 
+// Temporary fix: manually include output classes until cache is cleared.
+require_once($CFG->dirroot . '/local/page/classes/output/page_card.php');
+require_once($CFG->dirroot . '/local/page/classes/output/pages_list.php');
+require_once($CFG->dirroot . '/local/page/classes/output/page_content.php');
+
+use local_page\output\page_card;
+use local_page\output\pages_list;
+use local_page\output\page_content;
+
 /**
  *
  * Class local_page_renderer
@@ -40,6 +49,36 @@ class local_page_renderer extends plugin_renderer_base {
      * @var array
      */
     public $errorfields = [];
+
+    /**
+     * Render a page card using the Output API
+     *
+     * @param page_card $pagecard Page card output object
+     * @return string The rendered HTML
+     */
+    public function render_page_card(page_card $pagecard): string {
+        return $this->render_from_template('local_page/page_card', $pagecard->export_for_template($this));
+    }
+
+    /**
+     * Render pages list using the Output API
+     *
+     * @param pages_list $pageslist Pages list output object
+     * @return string The rendered HTML
+     */
+    public function render_pages_list(pages_list $pageslist): string {
+        return $this->render_from_template('local_page/pages_list', $pageslist->export_for_template($this));
+    }
+
+    /**
+     * Render page content using the Output API
+     *
+     * @param page_content $pagecontent Page content output object
+     * @return string The rendered HTML
+     */
+    public function render_page_content(page_content $pagecontent): string {
+        return $this->render_from_template('local_page/page_content', $pagecontent->export_for_template($this));
+    }
 
     /**
      * Get the submenu item
@@ -57,152 +96,8 @@ class local_page_renderer extends plugin_renderer_base {
      * @return string The generated HTML for the page card
      */
     public function get_allpages($parent, $name, $status, $pagedate, $enddate, $menuname = null): string {
-        global $CFG, $USER;
-        $html = '';
-
-        // Start card div.
-        $html .= html_writer::start_div('custompages-card rounded');
-        $cardbodyclass = 'custompages-card-body rounded mb-3';
-        if ($status === 'draft') {
-            $cardbodyclass .= ' custompages-card-body--draft';
-        } else if ($status === 'archived') {
-            $cardbodyclass .= ' custompages-card-body--archived';
-        }
-        $html .= html_writer::start_div($cardbodyclass);
-
-        // Generate status badge based on page status.
-        $statusbadge = '';
-        $badgeclasses = [
-            'live' => 'badge badge-sq badge-success',
-            'draft' => 'badge badge-sq badge-warning',
-            'archived' => 'badge badge-sq badge-danger',
-        ];
-        if (isset($badgeclasses[$status])) {
-            $statusstring = get_string('status_' . $status, 'local_page');
-            $statusbadge = html_writer::tag('span', $statusstring, ['class' => $badgeclasses[$status]]);
-        }
-
-        // Has restricted access by dates.
-        $restricted = false;
-        if ($pagedate > 0 && $status === 'live' && $pagedate > time()) {
-            $restricted = true;
-        } else if ($pagedate > 0 && $status === 'draft' && $pagedate <= time()) {
-            $restricted = true;
-        } else if ($enddate > 0 && $enddate < time()) {
-            $restricted = true;
-        }
-
-        // Add title.
-        $html .= html_writer::tag('div', $statusbadge, ['class' => 'custompages-title-badge d-inline-block me-2 mb-2']);
-        if ($restricted) {
-            $html .= html_writer::tag('span', get_string('restricted', 'local_page'), ['class' => 'badge badge-sq badge-warning']);
-        }
-
-        $html .= html_writer::tag('h5', shorten_text($name, 100), ['class' => 'custompages-title font-weight-medium']);
-        // Edit button.
-        $editurl = new moodle_url($CFG->wwwroot . '/local/page/edit.php', ['id' => $parent]);
-        $html .= html_writer::start_div('w-100 border-bottom mb-2 pb-2');
-        $html .= html_writer::link($editurl, get_string('edit', 'moodle'), ['class' => 'm-0 btn btn-secondary w-100']);
-        $html .= html_writer::end_div();
-
-        // Link to the page url to copy.
-        $html .= html_writer::tag('label', get_string('url', 'moodle'), ['class' => 'custompages-title-badge-label']);
-        $html .= html_writer::tag('pre', $CFG->wwwroot . '/local/page/?id=' . $parent, ['class' => 'custompage-url mb-2']);
-
-        if ($menuname) {
-            // Link Friendly URL to copy.
-            $html .= html_writer::tag('label', get_string('menu_name', 'local_page'), ['class' => 'custompages-title-badge-label']);
-            $html .= html_writer::tag('pre', $CFG->wwwroot . '/local/page/' . $menuname, ['class' => 'custompage-url mb-2']);
-        }
-
-        // Start button group.
-        $html .= html_writer::start_div('custompages-btn-group', ['role' => 'group']);
-
-        // Create a two-column layout.
-        $html .= html_writer::start_div('row w-100 no-gutters mt-2 border-top pt-3');
-
-        // First column - View button.
-        $html .= html_writer::start_div('col me-2');
-        $viewurl = new moodle_url($CFG->wwwroot . '/local/page/', ['id' => $parent]);
-        $html .= html_writer::link(
-            $viewurl,
-            '<i class="fa-solid fa-arrow-up-right-from-square"></i>',
-            ['class' => 'm-0 btn btn-info w-100', 'target' => '_blank']
-        );
-        $html .= html_writer::end_div(); // End div for class 'col me-2'.
-        // Second column - Delete button.
-        $html .= html_writer::start_div('col ms-2');
-        $deleteurl = new moodle_url(
-            $CFG->wwwroot . '/local/page/pages.php',
-            ['pagedel' => $parent, 'sesskey' => $USER->sesskey]
-        );
-        $html .= html_writer::link(
-            '#',
-            '<i class="fa fa-trash"></i>',
-            [
-                'class' => 'm-0 btn btn-danger w-100',
-                'data-toggle' => 'modal',
-                'data-target' => '#deleteConfirmModal' . $parent,
-                'role' => 'button',
-            ]
-        );
-
-        // Modal confirmation window.
-        $html .= html_writer::start_tag('div', [
-            'class' => 'modal fade',
-            'id' => 'deleteConfirmModal' . $parent,
-            'tabindex' => '-1',
-            'role' => 'dialog',
-            'aria-labelledby' => 'deleteConfirmModalLabel' . $parent,
-            'aria-hidden' => 'true',
-        ]);
-        $html .= html_writer::start_tag('div', ['class' => 'modal-dialog', 'role' => 'document']);
-        $html .= html_writer::start_tag('div', ['class' => 'modal-content']);
-        // Modal header.
-        $html .= html_writer::start_tag('div', ['class' => 'modal-header']);
-        $html .= html_writer::tag('h5', get_string('delete', 'local_page'), [
-            'class' => 'modal-title',
-            'id' => 'deleteConfirmModalLabel' . $parent,
-        ]);
-        $html .= html_writer::start_tag('button', [
-            'type' => 'button',
-            'class' => 'close',
-            'data-dismiss' => 'modal',
-            'aria-label' => get_string('close', 'admin'),
-        ]);
-        $html .= html_writer::tag('span', '&times;', ['aria-hidden' => 'true']);
-        $html .= html_writer::end_tag('button');
-        $html .= html_writer::end_tag('div');
-        // Modal body.
-        $html .= html_writer::start_tag('div', ['class' => 'modal-body']);
-        $html .= html_writer::tag('p', get_string('confirmdeletepage', 'local_page', $name));
-        $html .= html_writer::end_tag('div');
-        // Modal footer.
-        $html .= html_writer::start_tag('div', ['class' => 'modal-footer']);
-        $html .= html_writer::tag('button', get_string('cancel', 'moodle'), [
-            'type' => 'button',
-            'class' => 'btn btn-link col text-center',
-            'data-dismiss' => 'modal',
-        ]);
-        $html .= html_writer::link(
-            $deleteurl,
-            '<i class="fa fa-trash me-1"></i> ' . get_string('delete', 'local_page'),
-            ['class' => 'btn btn-danger col']
-        );
-        $html .= html_writer::end_tag('div');
-        $html .= html_writer::end_tag('div');
-        $html .= html_writer::end_tag('div');
-        $html .= html_writer::end_tag('div');
-        $html .= html_writer::end_div(); // End div for class 'col ms-2'.
-
-        $html .= html_writer::end_div(); // End div for class 'row w-100 no-gutters mt-2 border-top pt-3'.
-
-        // End button group and card.
-        $html .= html_writer::end_div(); // End div for class 'custompages-btn-group'.
-        $html .= html_writer::end_div(); // End div for class 'custompages-card-body'.
-        $html .= html_writer::end_div(); // End div for class 'custompages-card rounded'.
-
-        return $html;
+        $pagecard = new page_card($parent, $name, $status, $pagedate, $enddate, $menuname);
+        return $this->render_page_card($pagecard);
     }
 
     /**
@@ -212,7 +107,7 @@ class local_page_renderer extends plugin_renderer_base {
      * @return string
      */
     public function list_pages() {
-        global $DB, $CFG;
+        global $DB;
 
         // Get all non-deleted pages ordered by name.
         $records = $DB->get_records_sql(
@@ -222,79 +117,8 @@ class local_page_renderer extends plugin_renderer_base {
              ORDER BY pagename"
         );
 
-        // Build the main wrapper.
-        $html = html_writer::start_div('custompages-list-wrapper');
-
-        // Add list of pages.
-        $html .= html_writer::start_div('custompages-list w-100');
-
-        // Group pages by status.
-        $livepages = [];
-        $draftpages = [];
-        $archivedpages = [];
-
-        // Sort pages by status.
-        foreach ($records as $page) {
-            if ($page->status == 'live') {
-                $livepages[] = $page;
-            } else if ($page->status == 'draft') {
-                $draftpages[] = $page;
-            } else if ($page->status == 'archived') {
-                $archivedpages[] = $page;
-            }
-        }
-
-        // Display live pages.
-        if (!empty($livepages)) {
-            $html .= html_writer::tag('h3', get_string('status_live', 'local_page'), ['class' => 'font-weight-medium mb-3']);
-            $html .= html_writer::start_div('custompages-item mb-4');
-            foreach ($livepages as $page) {
-                $html .= $this->get_allpages($page->id, $page->pagename,
-                    $page->status, $page->pagedate, $page->enddate, $page->menuname);
-            }
-            $html .= html_writer::end_div();
-        }
-
-        // Display draft pages.
-        if (!empty($draftpages)) {
-            $html .= html_writer::tag('h3', get_string('status_draft', 'local_page'), ['class' => 'font-weight-medium mt-6 mb-3']);
-            $html .= html_writer::start_div('custompages-item mb-4');
-            foreach ($draftpages as $page) {
-                $html .= $this->get_allpages($page->id, $page->pagename, $page->status,
-                    $page->pagedate, $page->enddate, $page->menuname);
-            }
-            $html .= html_writer::end_div();
-        }
-
-        // Display archived pages.
-        if (!empty($archivedpages)) {
-            $html .= html_writer::tag('h3', get_string('status_archived', 'local_page'),
-                ['class' => 'font-weight-medium mt-6 mb-3']);
-            $html .= html_writer::start_div('custompages-item mb-4');
-            foreach ($archivedpages as $page) {
-                $html .= $this->get_allpages($page->id, $page->pagename, $page->status,
-                    $page->pagedate, $page->enddate, $page->menuname);
-            }
-            $html .= html_writer::end_div();
-        }
-
-        $html .= html_writer::end_div();
-
-        // Add footer with "Add page" button.
-        $html .= html_writer::start_div('custompages-footer mt-4');
-        $html .= html_writer::start_div('custompages-list-element');
-        $addpageurl = new moodle_url($CFG->wwwroot . '/local/page/edit.php');
-        $html .= html_writer::link(
-            $addpageurl,
-            get_string('addpage', 'local_page'),
-            ['class' => 'custompages-add btn btn-primary']
-        );
-        $html .= html_writer::end_div();
-        $html .= html_writer::end_div();
-
-        $html .= html_writer::end_div();
-
-        return $html;
+        $pageslist = new pages_list($records);
+        return $this->render_pages_list($pageslist);
     }
 
     /**
@@ -350,7 +174,7 @@ class local_page_renderer extends plugin_renderer_base {
         }
         $isadmin = has_capability('moodle/site:config', $context);
 
-        if ($permissions && $istimevalid || $isadmin) {
+        if (($permissions && $istimevalid) || $isadmin) {
             $today = time(); // Get the current timestamp.
             // Fetch records from the database for pages that are not deleted and are of a specific type.
             $records = $DB->get_records_sql("SELECT * FROM {local_page} WHERE deleted=0 " .
@@ -365,10 +189,14 @@ class local_page_renderer extends plugin_renderer_base {
             );
 
             // Replace placeholders in the page content with the actual form content.
-            return str_replace(["#form#", "{form}"], [$form, $form], $pagecontent);
+            $content = str_replace(["#form#", "{form}"], [$form, $form], $pagecontent);
+            $pagecontentobj = new page_content(true, $content);
+            return $this->render_page_content($pagecontentobj);
         } else {
             // Return a no access message if the user does not have permission.
-            return get_string('noaccess', 'local_page');
+            $noaccessmsg = get_string('noaccess', 'local_page');
+            $pagecontentobj = new page_content(false, '', $noaccessmsg);
+            return $this->render_page_content($pagecontentobj);
         }
     }
 
@@ -409,70 +237,6 @@ class local_page_renderer extends plugin_renderer_base {
         }
 
         return $data;
-    }
-
-    /**
-     *
-     * Check if the form is valid
-     *
-     * @param mixed $records
-     * @return bool
-     */
-    public function valid($records) {
-        $valid = true;
-        foreach ((array)$records as $key => $value) {
-            $tmpparam = trim(str_replace(" ", "_", $value->name));
-            $tmpparam = trim(optional_param($tmpparam, '', PARAM_RAW));
-
-            if ($value->required == "Yes" && $value->type != "HTML") {
-                if (
-                    $value->type == "Email" && (stripos($tmpparam, "@") === false ||
-                        stripos($tmpparam, ".") === false)
-                ) {
-                    $this->error_fields[$value->name] = get_string('validemail', 'local_page', $value->name);
-                    $valid = false;
-                }
-
-                if ($value->type != 'Email' && $tmpparam == '') {
-                    $this->error_fields[$value->name] = get_string('pleasefillin', 'local_page', $value->name);
-                    $valid = false;
-                }
-
-                if ($value->type == 'Numeric' && !is_numeric($tmpparam)) {
-                    $this->error_fields[$value->name] = get_string('pleasefillinnumber', 'local_page', $value->name);
-                    $valid = false;
-                }
-            }
-        }
-        return $valid;
-    }
-    /**
-     * clean the incoming data according to field type
-     * @param mixed $data
-     * @param string $type
-     * @return array|float|int|mixed|string|null
-     * @throws coding_exception
-     */
-    public function cleanme($data, $type) {
-        $safedata = '';
-        switch (mb_strtolower($type)) {
-            case 'email':
-                $safedata = clean_param($data, PARAM_EMAIL);
-                break;
-            case 'number':
-                $safedata = clean_param($data, PARAM_FLOAT);
-                break;
-            case 'text':
-            case 'text area':
-            case 'select':
-            case 'checkbox':
-                $safedata = preg_replace('/[^A-Za-z0-9 _-]/i', '', $data);
-                break;
-            default:
-                $safedata = preg_replace('/[^A-Za-z0-9 _-]/i', '', $data);
-        }
-
-        return $safedata;
     }
 
     /**
@@ -592,99 +356,5 @@ class local_page_renderer extends plugin_renderer_base {
         $mform->display();
     }
 
-    /**
-     *
-     * Gets all the menu items
-     *
-     * @param mixed $parent
-     * @param string $name
-     * @param string $url
-     * @return string
-     */
-    public function get_menuitem($parent, $name, $url) {
-        global $DB, $CFG;
-        $context = context_system::instance();
-        $html = '';
-        $urllocation = new moodle_url($CFG->wwwroot . '/local/page/', ['id' => $parent]);
-        if (get_config('local_page', 'cleanurl_enabled')) {
-            $urllocation = new moodle_url($CFG->wwwroot . '/local/page/' . $url);
-        }
-        $today = date('U');
-        $records = $DB->get_records_sql("SELECT * FROM {local_page} WHERE deleted=0 AND onmenu=1 " .
-            " AND pagedate <=? " .
-            "ORDER BY pagename", [$today]);
-        if ($records) {
-            $html .= html_writer::start_tag('li', ['class' => 'custompages_item']);
-            $html .= html_writer::link($urllocation, $name);
-            $html .= html_writer::start_tag('ul', ['class' => 'custompages_submenu']);
-            $canaccess = true;
-            foreach ($records as $page) {
-                if (isset($page->accesslevel) && stripos($page->accesslevel, ":") !== false) {
-                    $canaccess = false;        // Page Has level Requirements - check rights.
-                    $levels = explode(",", $page->accesslevel);
-                    foreach ($levels as $level) {
-                        if ($canaccess != true) {
-                            if (stripos($level, "!") !== false) {
-                                $level = str_replace("!", "", $level);
-                                $canaccess = has_capability(trim($level), $context) ? false : true;
-                            } else {
-                                $canaccess = has_capability(trim($level), $context) ? true : false;
-                            }
-                        }
-                    }
-                }
-                if ($canaccess) {
-                    $html .= $this->get_menuitem($page->id, $page->pagename, $page->menuname);
-                }
-            }
-            $html .= html_writer::end_tag('ul');
-            $html .= html_writer::end_tag('li');
-        } else {
-            $html .= html_writer::start_tag('li', ['class' => 'custompages_item']);
-            $html .= html_writer::link($urllocation, $name);
-            $html .= html_writer::end_tag('li');
-        }
-        return $html;
-    }
 
-    /**
-     *
-     * Builds the menu for the page
-     *
-     * @return string
-     */
-    public function build_menu() {
-        global $DB;
-        $context = context_system::instance();
-        $dbman = $DB->get_manager();
-        $html = '';
-        if ($dbman->table_exists('local_page')) {
-            $html = '<ul class="custompages_nav">';
-            $today = date('U');
-            $records = $DB->get_records_sql("SELECT * FROM {local_page} WHERE deleted=0 AND onmenu=1 " .
-                " AND pagedate <= ? ORDER BY pagename", [$today]);
-            $canaccess = true;
-            foreach ($records as $page) {
-                if (isset($page->accesslevel) && stripos($page->accesslevel, ":") !== false) {
-                    $canaccess = false;
-                    $levels = explode(",", $page->accesslevel);
-                    foreach ($levels as $key => $level) {
-                        if ($canaccess != true) {
-                            if (stripos($level, "!") !== false) {
-                                $level = str_replace("!", "", $level);
-                                $canaccess = has_capability(trim($level), $context) ? false : true;
-                            } else {
-                                $canaccess = has_capability(trim($level), $context) ? true : false;
-                            }
-                        }
-                    }
-                }
-                if ($canaccess) {
-                    $html .= $this->get_menuitem($page->id, $page->pagename, $page->menuname);
-                }
-            }
-            $html .= "</ul>";
-        }
-        return $html;
-    }
 }
