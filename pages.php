@@ -37,7 +37,7 @@ $context = context_system::instance();
 // Set PAGE variables for the current page.
 $PAGE->set_context($context);
 $PAGE->set_url(new moodle_url('/local/page/pages.php'));
-$PAGE->set_pagelayout('standard');
+$PAGE->set_pagelayout('base');
 $PAGE->set_title(get_string('pagesetup_title', 'local_page'));
 $PAGE->set_heading(get_string('pagesetup_heading', 'local_page'));
 

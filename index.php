@@ -126,14 +126,18 @@ $additionalhead = $custompage->meta;
 $CFG->additionalhtmlhead = $headseo . $additionalhead;
 
 // Set the page layout to use.
-$PAGE->set_pagelayout('standard'); // Set the page layout.
+$PAGE->set_pagelayout('base'); // Set the page layout.
 
 // Set the page title and heading using the custom page's name.
 $PAGE->set_title($custompage->pagename);
 
 // Get page status for admin and user.
 $statusbadge = $custompage->status;
-$PAGE->set_heading($custompage->pagename);
+
+if ($custompage->hidetitle == 'no') {
+    $PAGE->set_heading($custompage->pagename);
+}
+
 // Set a custom body ID here.
 $PAGE->set_pagetype('local-page-id-' . $pageid); // Optional.
 
@@ -158,6 +162,7 @@ $renderer = $PAGE->get_renderer('local_page');
 
 // Output the page header, content, and footer.
 echo $OUTPUT->header(); // Display the page header.
+echo $OUTPUT->blocks('side-pre');
 echo $renderer->showpage($custompage); // Render and display the custom page content.
 
 // Check if the user has the capability to add pages or is a site admin.

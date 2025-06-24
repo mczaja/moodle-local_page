@@ -18,6 +18,7 @@
                 <FIELD NAME="metaauthor" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Meta author for the page" />
                 <FIELD NAME="metatitle" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Meta title for the page" />
                 <FIELD NAME="metarobots" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Meta robots for the page" />
+                <FIELD NAME="hidetitle" TYPE="char" LENGTH="10" NOTNULL="true" DEFAULT="no" SEQUENCE="false" COMMENT="Flag to indicate if the title of the page should be hidden" />
                 <FIELD NAME="onlyloggedin" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Flag to indicate if the page is only visible to logged in users" />
             </FIELDS>
             <KEYS>

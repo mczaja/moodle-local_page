@@ -549,6 +549,7 @@ class local_page_renderer extends plugin_renderer_base {
             $recordpage->metatitle = $data->metatitle;
             $recordpage->metarobots = $data->metarobots;
             $recordpage->onlyloggedin = $data->onlyloggedin;
+            $recordpage->hidetitle = $data->hidetitle;
 
             $recordpage->pagecontent = $data->pagecontent['text'];
             $result = $page->update($recordpage);
@@ -586,6 +587,7 @@ class local_page_renderer extends plugin_renderer_base {
         $forform->pagedate = $page->pagedate;
         $forform->enddate = $page->enddate;
         $forform->onlyloggedin = $page->onlyloggedin;
+        $forform->hidetitle = $page->hidetitle;
         $mform->set_data($forform);
         $mform->display();
     }
