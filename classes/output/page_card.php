@@ -99,9 +99,9 @@ class page_card implements renderable, templatable {
 
         // Generate status badge.
         $badgeclasses = [
-            'live' => 'badge badge-sq badge-success',
-            'draft' => 'badge badge-sq badge-warning',
-            'archived' => 'badge badge-sq badge-danger',
+            'live' => 'badge badge-sq bg-success',
+            'draft' => 'badge badge-sq bg-warning',
+            'archived' => 'badge badge-sq bg-danger',
         ];
         if (isset($badgeclasses[$this->status])) {
             $statusstring = get_string('status_' . $this->status, 'local_page');

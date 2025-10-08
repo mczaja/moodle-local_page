@@ -150,12 +150,12 @@ class custompage {
         $data = null;
 
         if (!empty($menuname)) {
-                $data = $DB->get_record_sql(
-                    "SELECT * FROM {local_page}
-                     WHERE menuname = ? AND deleted = 0
-                     ORDER BY id DESC LIMIT 1",
+            $data = $DB->get_record_sql(
+                "SELECT * FROM {local_page}
+                 WHERE menuname = ? AND deleted = 0
+                 ORDER BY id DESC LIMIT 1",
                 [$menuname]
-                );
+            );
         }
 
         if (!$data || empty($data->pagecontent)) {

@@ -39,7 +39,7 @@
         "id": 123,
         "name": "Sample Page",
         "status": "live",
-        "statusbadge": "<span class='badge badge-sq badge-success'>Live</span>",
+        "statusbadge": "<span class='badge badge-sq bg-success'>Live</span>",
         "cardbodyclass": "custompages-card-body rounded mb-3",
         "restricted": false,
         "editurl": "/local/page/edit.php?id=123",
@@ -57,7 +57,7 @@
             {{{statusbadge}}}
         </div>
         {{#restricted}}
-            <span class="badge badge-sq badge-warning">{{#str}}restricted, local_page{{/str}}</span>
+            <span class="badge badge-sq bg-warning">{{#str}}restricted, local_page{{/str}}</span>
         {{/restricted}}
 
         {{! Page title }}
@@ -80,7 +80,7 @@
 
         {{! Action buttons }}
         <div class="custompages-btn-group" role="group">
-            <div class="row w-100 no-gutters mt-2 border-top pt-3">
+            <div class="row w-100 g-0 mt-2 border-top pt-3">
                 {{! View button }}
                 <div class="col me-2">
                     <a href="{{{viewurl}}}" target="_blank" class="m-0 btn btn-info w-100">
@@ -90,8 +90,8 @@
                 {{! Delete button }}
                 <div class="col ms-2">
                     <a href="#" class="m-0 btn btn-danger w-100" 
-                       data-toggle="modal" 
-                       data-target="#deleteConfirmModal{{id}}" 
+                       data-bs-toggle="modal" 
+                       data-bs-target="#deleteConfirmModal{{id}}" 
                        role="button">
                         <i class="fa fa-trash"></i>
                     </a>
@@ -108,15 +108,13 @@
                         <h5 class="modal-title" id="deleteConfirmModalLabel{{id}}">
                             {{#str}}delete, local_page{{/str}}
                         </h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="{{#str}}close, admin{{/str}}">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{#str}}close, admin{{/str}}"></button>
                     </div>
                     <div class="modal-body">
                         <p>{{#str}}confirmdeletepage, local_page, {{name}}{{/str}}</p>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-link col text-center" data-dismiss="modal">
+                        <button type="button" class="btn btn-link col text-center" data-bs-dismiss="modal">
                             {{#str}}cancel, moodle{{/str}}
                         </button>
                         <a href="{{{deleteurl}}}" class="btn btn-danger col">

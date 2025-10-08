@@ -1,36 +1,40 @@
 # CHANGELOG
 
+## [1.0.5] - 2025-10-07
+### Fixed
+- Resolved issue with the Delete Page button not functioning as expected.
+
 ## [1.0.4] - 2025-07-21
-### Added:
- - Better support for Moodle 5.0
+### Added
+- Enhanced compatibility with Moodle 5.0.
 
 ### Improved
-- Friendly URLs for custom pages
+- Improved support for friendly URLs in custom pages.
 
 ## [1.0.3] - 2025-06-24
-### Added:
- - Added option to hide the title of the page
+### Added
+- Option to hide the page title.
 
 ### Fixed
-- Missing language string for capability definition
+- Added missing language string for capability definition.
 
 ## [1.0.2] - 2025-06-03
-### Added:
- - Added option to hide the title of the page
+### Added
+- Option to hide the page title.
 
 ### Fixed
-- Missing language string for capability definition
+- Added missing language string for capability definition.
 
 ## [1.0.1] - 2025-04-30
-### Added:
- - Added modal confirmation dialog when deleting pages to prevent accidental deletion
- - Improved user experience with clear confirmation messages and action buttons
- 
+### Added
+- Modal confirmation dialog for page deletion to prevent accidental removal.
+- Enhanced user experience with clear confirmation messages and action buttons.
+
 ### Fixed
-- Missing Open Graph Image File
-- Hard-coded language strings
-- Missing language string for capability definition
+- Added missing Open Graph image file.
+- Replaced hard-coded language strings with language file references.
+- Added missing language string for capability definition.
 
 ## [1.0.0] - 2025-04-02
 ### Added
-- Initial release
+- Initial release.
