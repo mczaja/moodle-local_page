@@ -132,7 +132,7 @@ class page_card implements renderable, templatable {
         // Add friendly URL if menuname exists.
         if ($this->menuname) {
             $data->menuname = $this->menuname;
-            $data->friendlyurl = $CFG->wwwroot . '/local/page/' . $this->menuname;
+            $data->friendlyurl = $CFG->wwwroot . '/' . $this->menuname;
         }
 
         return $data;

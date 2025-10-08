@@ -67,16 +67,16 @@ echo html_writer::tag(
     html_writer::link($backlink, html_writer::tag(
         'i',
         '',
-        ['class' => 'fas fa-arrow-left mr-1']
+        ['class' => 'fas fa-arrow-left me-1']
     ) . ' ' .
-        $backtext, ['class' => 'btn btn-sm btn-secondary mr-3']),
+        $backtext, ['class' => 'btn btn-sm btn-secondary me-3']),
     ['class' => 'd-inline-flex align-items-center']
 );
 
 // Preview button.
 echo html_writer::link(
     $previewlink,
-    html_writer::tag('i', '', ['class' => 'fas fa-eye mr-1']) . ' ' . get_string('preview', 'editor'),
+    html_writer::tag('i', '', ['class' => 'fas fa-eye me-1']) . ' ' . get_string('preview', 'editor'),
     ['class' => 'btn btn-sm btn-success', 'target' => '_blank']
 );
 

@@ -31,7 +31,7 @@ $string['addpages'] = "Add Multiple Pages";
 $string['backtolist'] = "Return to Pages List";
 $string['cleanurl_enabled'] = 'Activate Clean URLs';
 $string['cleanurl_enabled_description'] = 'Enable the use of clean URLs for links. <br />
-<strong>Note:</strong> This will replace the default link structure. For example: <strong>about-us</strong> will result in http://URL/local/page/<strong>about-us</strong><br />
+<strong>Note:</strong> This will replace the default link structure. For example: <strong>about-us</strong> will result in http://URL/<strong>about-us</strong><br />
 <strong>Mod_rewrite</strong> must be enabled on your server to use clean URLs.';
 $string['confirmdeletepage'] = 'Are you sure you want to delete the page \'{$a}\'?';
 $string['custompage_title'] = 'Page Management';
@@ -65,7 +65,7 @@ $string['label_required'] = "Mandatory Field";
 $string['managepages'] = "Manage Pages";
 $string['menu_name'] = 'Friendly URL';
 $string['menu_name_description'] = 'Friendly URL Description';
-$string['menu_name_description_help'] = 'Provide a user-friendly URL for the page. Use only letters, numbers, and hyphens. This will replace the default link structure. For example: <strong>about-us</strong> will result in http://URL/local/page/<strong>about-us</strong>';
+$string['menu_name_description_help'] = 'Provide a user-friendly URL for the page. Use only letters, numbers, and hyphens. This will replace the default link structure. For example: <strong>about-us</strong> will result in http://URL/<strong>about-us</strong>';
 $string['metaauthor'] = 'Meta Author';
 $string['metaauthor_description'] = 'Meta Author Description';
 $string['metaauthor_description_help'] = 'Provide a meta author for the page. This will be used to identify the author of the page.';

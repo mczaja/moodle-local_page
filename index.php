@@ -33,16 +33,29 @@ require(__DIR__ . '/../../config.php');
 global $CFG, $PAGE, $USER, $DB, $SITE;
 require_once($CFG->dirroot . '/local/page/lib.php'); // Include the library file for local_page plugin functions.
 
-// Retrieve the ID of the page to be displayed from the URL parameters.
+// Retrieve the ID or menuname of the page to be displayed from the URL parameters.
 $pageid = optional_param('id', 0, PARAM_INT);
+$menuname = optional_param('menuname', '', PARAM_TEXT);
 
-// Load the custom page object using the page ID.
-$custompage = \local_page\custompage::load($pageid);
+// Load the custom page object using the page ID or menuname.
+if (!empty($menuname)) {
+    // Load by menuname
+    $custompage = \local_page\custompage::load_by_menuname($menuname);
+} else {
+    // Load by ID
+    $custompage = \local_page\custompage::load($pageid);
+}
 
 // Set up the page context and URL for the current page.
 $context = context_system::instance(); // Get the system context.
 $PAGE->set_context($context); // Set the context for the page.
-$PAGE->set_url(new moodle_url('/local/page/index.php', ['id' => $pageid])); // Define the URL for the page.
+
+// Set the URL based on whether we're using menuname or ID
+if (!empty($menuname)) {
+    $PAGE->set_url(new moodle_url('/' . $menuname)); // Define the URL for the page using menuname.
+} else {
+    $PAGE->set_url(new moodle_url('/local/page/index.php', ['id' => $pageid])); // Define the URL for the page using ID.
+}
 
 // Check if the custom page has specific access level requirements.
 if (!empty($custompage->accesslevel)) {
@@ -94,22 +107,11 @@ if ($files) {
 }
 
 // Build the canonical URL for the page.
-// Use $PAGE->url which should be the canonical URL at this stage.
-$canonicalurl = new moodle_url($PAGE->url);
-
-// Use clean URL format if enabled and the current URL seems to be using it.
-if (get_config('local_page', 'cleanurl_enabled') && !empty($custompage->menuname)) {
-    // Check if the current URL path matches the expected clean URL pattern.
-    $pathmatch = '/' . preg_quote($custompage->menuname, '/');
-    if (preg_match("~$pathmatch/?$~", $PAGE->url->get_path())) {
-        // Assume clean URL is used, ensure no query parameters like 'id'.
-        $canonicalurl->remove_all_params();
-    } else {
-        // Fallback to ID-based URL if clean URL doesn't match current URL path.
-        $canonicalurl = new moodle_url('/local/page/index.php', ['id' => $custompage->id]);
-    }
+if (!empty($menuname) && !empty($custompage->menuname)) {
+    // Use the root-level URL format
+    $canonicalurl = new moodle_url('/' . $custompage->menuname);
 } else {
-    // Otherwise use standard URL format with ID parameter.
+    // Use standard URL format with ID parameter.
     $canonicalurl = new moodle_url('/local/page/index.php', ['id' => $custompage->id]);
 }
 
@@ -171,7 +173,7 @@ if (has_capability('local/page:addpages', $context) || is_siteadmin()) {
     $footerbtn = html_writer::div(
         html_writer::link(
             new moodle_url('/local/page/edit.php', ['id' => $pageid]),
-            '<i class="fa fa-pencil mr-2"></i>' . get_string('edit', 'moodle'),
+            '<i class="fa fa-pencil me-2"></i>' . get_string('edit', 'moodle'),
             ['class' => 'btn btn-primary']
         ),
         'local-page-admin-controls mt-3'

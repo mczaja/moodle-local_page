@@ -96,9 +96,9 @@ class custompage {
     }
 
     /**
-     * Loads a page from the database by ID or by URL (menuname).
+     * Loads a page from the database by ID.
      *
-     * @param int $id The page ID to load, or 0 to load by URL.
+     * @param int $id The page ID to load.
      * @param bool $editor Whether the page is being loaded for editing.
      * @return custompage The loaded page object.
      */
@@ -111,20 +111,51 @@ class custompage {
 
         if (intval($id) > 0) {
             $data = $DB->get_record('local_page', ['id' => intval($id)]);
-        } else {
-            $requesturi = $_SERVER['REQUEST_URI'] ?? '';
-            $main = explode('?', trim($requesturi));
-            $parts = array_filter(explode('/', trim($main[0])));
-            $lastpart = end($parts);
+        }
 
-            if ($lastpart !== false && $lastpart !== '') {
+        if (!$data || empty($data->pagecontent)) {
+            if (!$data) {
+                $data = new \stdClass();
+            }
+            $data->pagecontent = $editor ? '' : \get_string('noaccess', 'local_page');
+        }
+
+        if (!$editor && !empty($data->pagecontent)) {
+            $context = \context_system::instance();
+            $data->pagecontent = \file_rewrite_pluginfile_urls(
+                $data->pagecontent,
+                'pluginfile.php',
+                $context->id,
+                'local_page',
+                'pagecontent',
+                null
+            );
+        }
+
+        return new custompage($data);
+    }
+
+    /**
+     * Loads a page from the database by menuname.
+     *
+     * @param string $menuname The menuname to load.
+     * @param bool $editor Whether the page is being loaded for editing.
+     * @return custompage The loaded page object.
+     */
+    public static function load_by_menuname($menuname, $editor = false): custompage {
+        global $DB, $CFG;
+        require_once($CFG->libdir . '/formslib.php');
+        require_once(dirname(__FILE__) . '/../lib.php');
+
+        $data = null;
+
+        if (!empty($menuname)) {
                 $data = $DB->get_record_sql(
                     "SELECT * FROM {local_page}
                      WHERE menuname = ? AND deleted = 0
                      ORDER BY id DESC LIMIT 1",
-                    [$lastpart]
+                [$menuname]
                 );
-            }
         }
 
         if (!$data || empty($data->pagecontent)) {

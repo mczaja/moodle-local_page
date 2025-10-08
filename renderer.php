@@ -291,7 +291,6 @@ class local_page_renderer extends plugin_renderer_base {
                 ")",
                 "+",
                 "=",
-                "-",
                 ".",
                 ":",
                 "<",

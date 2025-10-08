@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## [1.0.4] - 2025-07-21
+### Added:
+ - Better support for Moodle 5.0
+
+### Improved
+- Friendly URLs for custom pages
+
 ## [1.0.3] - 2025-06-24
 ### Added:
  - Added option to hide the title of the page
