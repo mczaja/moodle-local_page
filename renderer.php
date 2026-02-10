@@ -263,14 +263,20 @@ class local_page_renderer extends plugin_renderer_base {
         } else if ($data = $mform->get_data()) {
             require_once($CFG->libdir . '/formslib.php');
             $context = context_system::instance();
-            $data->pagecontent['text'] = file_save_draft_area_files(
-                $data->pagecontent['itemid'],
+            $draftitemid = file_get_submitted_draft_itemid('pagecontent');
+            $pagecontenttext = '';
+            if (isset($data->pagecontent) && is_array($data->pagecontent) && array_key_exists('text', $data->pagecontent)) {
+                $pagecontenttext = $data->pagecontent['text'];
+            }
+
+            $savedpagecontent = file_save_draft_area_files(
+                $draftitemid,
                 $context->id,
                 'local_page',
                 'pagecontent',
                 0,
                 ['subdirs' => true],
-                $data->pagecontent['text']
+                $pagecontenttext
             );
 
             $data->pagedata = '';
@@ -325,7 +331,7 @@ class local_page_renderer extends plugin_renderer_base {
             $recordpage->hidetitle = $data->hidetitle;
             $recordpage->contenthtml = $data->contenthtml;
 
-            $recordpage->pagecontent = $data->pagecontent['text'];
+            $recordpage->pagecontent = $savedpagecontent;
             $result = $page->update($recordpage);
             if ($result && $result > 0) {
                 $options = ['subdirs' => 0, 'maxbytes' => 204800, 'maxfiles' => 1, 'accepted_types' => '*'];

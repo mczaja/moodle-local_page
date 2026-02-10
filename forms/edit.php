@@ -213,8 +213,7 @@ class pages_edit_product_form extends moodleform {
             $editoroptions
         );
 
-        // Add validation rule for page content.
-        $mform->addRule('pagecontent', null, 'required', null, 'client');
+        // Page content is optional, so no required validation rule.
         $mform->setType('pagecontent', PARAM_RAW); // Set the type for page content.
 
         // Content HTML field.

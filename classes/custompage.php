@@ -113,11 +113,15 @@ class custompage {
             $data = $DB->get_record('local_page', ['id' => intval($id)]);
         }
 
-        if (!$data || empty($data->pagecontent)) {
-            if (!$data) {
-                $data = new \stdClass();
-            }
+        // Handle cases where the page does not exist or has no main content.
+        if (!$data) {
+            // No record found in DB – treat as "no access" for viewers, empty for editor.
+            $data = new \stdClass();
             $data->pagecontent = $editor ? '' : \get_string('noaccess', 'local_page');
+        } else if (empty($data->pagecontent)) {
+            // Page exists but has no editor content – allow this and keep it empty.
+            // This lets pages rely solely on the raw HTML field (contenthtml).
+            $data->pagecontent = '';
         }
 
         // Initialize contenthtml field if not set
@@ -163,11 +167,15 @@ class custompage {
             );
         }
 
-        if (!$data || empty($data->pagecontent)) {
-            if (!$data) {
-                $data = new \stdClass();
-            }
+        // Handle cases where the page does not exist or has no main content.
+        if (!$data) {
+            // No record found in DB – treat as "no access" for viewers, empty for editor.
+            $data = new \stdClass();
             $data->pagecontent = $editor ? '' : \get_string('noaccess', 'local_page');
+        } else if (empty($data->pagecontent)) {
+            // Page exists but has no editor content – allow this and keep it empty.
+            // This lets pages rely solely on the raw HTML field (contenthtml).
+            $data->pagecontent = '';
         }
 
         // Initialize contenthtml field if not set
