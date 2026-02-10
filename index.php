@@ -163,9 +163,13 @@ if ($pageid) {
 $renderer = $PAGE->get_renderer('local_page');
 
 // Output the page header, content, and footer.
+$contenthtml = $custompage->contenthtml;
+
 echo $OUTPUT->header(); // Display the page header.
 echo $OUTPUT->blocks('side-pre');
-echo $renderer->showpage($custompage); // Render and display the custom page content.
+echo $renderer->showpage($custompage) . $contenthtml; // Render and display the custom page content.
+
+
 
 // Check if the user has the capability to add pages or is a site admin.
 if (has_capability('local/page:addpages', $context) || is_siteadmin()) {

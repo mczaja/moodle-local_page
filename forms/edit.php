@@ -217,6 +217,13 @@ class pages_edit_product_form extends moodleform {
         $mform->addRule('pagecontent', null, 'required', null, 'client');
         $mform->setType('pagecontent', PARAM_RAW); // Set the type for page content.
 
+        // Content HTML field.
+        $mform->addElement('textarea', 'contenthtml', get_string('contenthtml', 'local_page'), 
+            ['rows' => 10, 'cols' => 80, 'placeholder' => 'Enter raw HTML content here...']);
+        $mform->setType('contenthtml', PARAM_RAW); // Set the type for content HTML.
+        $mform->addHelpButton('contenthtml', 'contenthtml_description', 'local_page'); // Add help button.
+
+        
         // Head Content.
         $mform->addElement('header', 'htmlhead', get_string('additionalhtml', 'admin'));
 

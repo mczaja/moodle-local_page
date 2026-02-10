@@ -120,6 +120,11 @@ class custompage {
             $data->pagecontent = $editor ? '' : \get_string('noaccess', 'local_page');
         }
 
+        // Initialize contenthtml field if not set
+        if (!isset($data->contenthtml)) {
+            $data->contenthtml = '';
+        }
+
         if (!$editor && !empty($data->pagecontent)) {
             $context = \context_system::instance();
             $data->pagecontent = \file_rewrite_pluginfile_urls(
@@ -163,6 +168,11 @@ class custompage {
                 $data = new \stdClass();
             }
             $data->pagecontent = $editor ? '' : \get_string('noaccess', 'local_page');
+        }
+
+        // Initialize contenthtml field if not set
+        if (!isset($data->contenthtml)) {
+            $data->contenthtml = '';
         }
 
         if (!$editor && !empty($data->pagecontent)) {

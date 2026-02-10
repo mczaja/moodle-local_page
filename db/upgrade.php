@@ -48,5 +48,17 @@ function xmldb_local_page_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2025060200, 'local', 'page');
     }
 
+    if ($oldversion < 2025100804) {
+        // Define field contenthtml to be added to local_page.
+
+        $table = new xmldb_table('local_page');
+        $field = new xmldb_field('contenthtml', XMLDB_TYPE_TEXT, null, null, null, null, null, 'onlyloggedin');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        upgrade_plugin_savepoint(true, 2025100804, 'local', 'page');
+    }
+
     return true;
 }

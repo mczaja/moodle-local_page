@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## [1.0.7] - 2026-02-09
+### Fixed
+- Minor bug fixes and improvements
+
+## [1.0.6] - 2025-10-09
+### Fixed
+- Additional HTML Content
+
 ## [1.0.5] - 2025-10-07
 ### Fixed
 - Resolved issue with the Delete Page button not functioning as expected.

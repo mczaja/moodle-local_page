@@ -188,9 +188,19 @@ class local_page_renderer extends plugin_renderer_base {
                 ['trusted' => true, 'noclean' => true]
             );
 
+            // Add content HTML if available (raw HTML content).
+            $contenthtml = '';
+            if (!empty($page->contenthtml)) {
+                $contenthtml = $this->adduserdata($page->contenthtml);
+            }
+
             // Replace placeholders in the page content with the actual form content.
             $content = str_replace(["#form#", "{form}"], [$form, $form], $pagecontent);
-            $pagecontentobj = new page_content(true, $content);
+            
+            // Combine regular content with raw HTML content.
+            $finalcontent = $content . $contenthtml;
+            
+            $pagecontentobj = new page_content(true, $finalcontent);
             return $this->render_page_content($pagecontentobj);
         } else {
             // Return a no access message if the user does not have permission.
@@ -313,6 +323,7 @@ class local_page_renderer extends plugin_renderer_base {
             $recordpage->metarobots = $data->metarobots;
             $recordpage->onlyloggedin = $data->onlyloggedin;
             $recordpage->hidetitle = $data->hidetitle;
+            $recordpage->contenthtml = $data->contenthtml;
 
             $recordpage->pagecontent = $data->pagecontent['text'];
             $result = $page->update($recordpage);
@@ -351,9 +362,8 @@ class local_page_renderer extends plugin_renderer_base {
         $forform->enddate = $page->enddate;
         $forform->onlyloggedin = $page->onlyloggedin;
         $forform->hidetitle = $page->hidetitle;
+        $forform->contenthtml = $page->contenthtml;
         $mform->set_data($forform);
         $mform->display();
     }
-
-
 }
