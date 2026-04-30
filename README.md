@@ -19,6 +19,58 @@ This module allows users to create and manage custom pages within Moodle. It pro
 - **Access Level**: Specify the capabilities required to view the page. Use commas to separate multiple capabilities.
 - **Additional HTML**: Optionally add custom HTML to the `<head>` section of the page for additional styling or scripts.
 
+## Friendly URLs (`menuname`)
+
+Pages can use a **Friendly URL** slug (`menuname`) so viewers can open  
+`https://yourmoodlesite.example/path/to/moodle/about-us`  
+instead of  
+`https://yourmoodlesite.example/path/to/moodle/local/page/index.php?menuname=about-us`.
+
+### What the plugin does not do
+
+- The **`.htaccess` file inside this plugin directory** only applies to URLs under `/local/page/`. It does **not** map root-level paths like `/about-us` to the viewer.
+- Moodle’s optional **`$CFG->urlrewriteclass`** hook only rewrites **outgoing** links when `moodle_url::out()` runs; it does **not** route incoming browser requests by itself.
+
+So for `/about-us` to work, something **outside** this plugin must send that request to PHP (usually Moodle’s `index.php` or this plugin’s `local/page/index.php` with `menuname`).
+
+### Web server: rewrite at the Moodle web root
+
+Place rules where your **Moodle installation’s URL root** is served (same vhost as `$CFG->wwwroot`). Adjust the path prefix if Moodle lives in a subdirectory (e.g. `/moodle/`).
+
+**Apache** (`mod_rewrite`), inside the `<Directory>` for your Moodle docroot or in the vhost:
+
+```apache
+RewriteEngine On
+# If the request is not a real file/dir and looks like a single slug segment, send to local_page.
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^([a-zA-Z0-9_-]+)$ /local/page/index.php?menuname=$1 [L,QSA]
+```
+
+If Moodle is under `/moodle/`, use `RewriteRule ^([a-zA-Z0-9_-]+)$ /moodle/local/page/index.php?menuname=$1 [L,QSA]` (or `RewriteBase /moodle/` and a relative target—match your layout).
+
+**Nginx** (illustrative `location`):
+
+```nginx
+location ~ ^/([a-zA-Z0-9_-]+)$ {
+    try_files $uri $uri/ /local/page/index.php?menuname=$1&$query_string;
+}
+```
+
+Again, prefix with your Moodle base path if not at domain root.
+
+**Conflicts**: A catch-all slug rule can shadow other single-segment routes. Restrict slugs in the rule, reserve paths, or place this rule after more specific locations.
+
+### Optional: shorten links Moodle prints (`urlrewriteclass`)
+
+To rewrite **generated** links from `…/local/page/index.php?menuname=slug` to `…/slug` (so emails and UI match your rewrite), add to **`config.php`** (only one rewriter class is supported site-wide):
+
+```php
+$CFG->urlrewriteclass = '\local_page\url_rewriter';
+```
+
+You still need the **web server** rules above so that `/slug` actually runs the viewer.
+
 ## Documentation
 https://rosea.gitbook.io/page-by-roseathemes
 

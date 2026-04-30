@@ -37,7 +37,6 @@ use stdClass;
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class page_content implements renderable, templatable {
-
     /** @var bool Whether user has access */
     protected $hasaccess;
 

@@ -1,5 +1,27 @@
 # CHANGELOG
 
+## [1.0.9] - 2026-04-29
+
+### Security
+- Page visibility and file access aligned so hidden or draft content is not leaked.
+- User placeholders in page content only use safe profile fields.
+- Open Graph images limited to common raster formats.
+
+### Fixed
+- Site “Additional HTML” and meta tags on the public page index behave correctly.
+- Admin pages list, delete flow, SQL portability, and capability checks cleaned up.
+- Form parameter types tightened; removed unused settings and dead code paths.
+
+### Added
+- Optional friendly outgoing URLs via `local_page\url_rewriter` and docs.
+
+### Improved
+- Edit form strings localised; clearer admin help for access levels and URLs.
+
+## [1.0.7] - 2026-02-17
+### Improved
+- Enhanced Moodle code precheck compliance for better code quality and maintainability.
+
 ## [1.0.7] - 2026-02-09
 ### Fixed
 - Minor bug fixes and improvements

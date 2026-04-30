@@ -25,6 +25,10 @@
 
 defined('MOODLE_INTERNAL') || die;
 
+// Local page:addpages is RISK_XSS: pages may include trusted editor HTML, raw Content HTML, and optional
+// <head> HTML. Archetypes grant CAP_ALLOW to manager and coursecreator at system context—equivalent to a
+// site-wide content injection role for this plugin.
+
 $capabilities = [
     'local/page:addpages' => [
 

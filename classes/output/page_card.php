@@ -38,7 +38,6 @@ use moodle_url;
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class page_card implements renderable, templatable {
-
     /** @var int Page ID */
     protected $id;
 
@@ -82,11 +81,14 @@ class page_card implements renderable, templatable {
      * @return stdClass
      */
     public function export_for_template(renderer_base $output) {
-        global $CFG, $USER;
+        global $CFG;
 
         $data = new stdClass();
         $data->id = $this->id;
-        $data->name = shorten_text($this->name, 100);
+        $shortname = shorten_text($this->name, 100);
+        $data->name = $shortname;
+        // Built in PHP so Mustache does not double-escape $a inside {{#str}} (see modal body).
+        $data->confirmdeletemessage = \get_string('confirmdeletepage', 'local_page', $shortname);
         $data->status = $this->status;
 
         // Generate card body class based on status.
@@ -125,8 +127,8 @@ class page_card implements renderable, templatable {
         $data->pageurl = $CFG->wwwroot . '/local/page/?id=' . $this->id;
         $data->viewurl = new moodle_url($CFG->wwwroot . '/local/page/', ['id' => $this->id]);
         $data->deleteurl = new moodle_url(
-            $CFG->wwwroot . '/local/page/pages.php',
-            ['pagedel' => $this->id, 'sesskey' => $USER->sesskey]
+            '/local/page/pages.php',
+            ['pagedel' => $this->id, 'sesskey' => \sesskey()]
         );
 
         // Add friendly URL if menuname exists.

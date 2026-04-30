@@ -26,14 +26,16 @@
  */
 
 // Strings for the settings page.
+$string['accesslevel'] = 'Required capability';
+$string['accesslevel_help'] = 'Optional comma-separated Moodle capabilities that further restrict who can view this page (in addition to status, dates, and "only logged in"). <strong>Evaluation is left-to-right with OR-style results:</strong> each entry is applied only while access is not yet granted; a plain capability name grants access if the user has that capability; a name prefixed with <strong>!</strong> grants access if the user does <em>not</em> have that capability. Once an entry grants access, remaining entries are ignored—order matters when you mix positive and negated rules. Example: <code>moodle/course:view, !moodle/site:config</code> allows any user with course view who is not a full site administrator. Leave empty for no extra capability gate.';
 $string['addpage'] = "Add New Page";
 $string['addpages'] = "Add Multiple Pages";
 $string['backtolist'] = "Return to Pages List";
-$string['cleanurl_enabled'] = 'Activate Clean URLs';
-$string['cleanurl_enabled_description'] = 'Enable the use of clean URLs for links. <br />
-<strong>Note:</strong> This will replace the default link structure. For example: <strong>about-us</strong> will result in http://URL/<strong>about-us</strong><br />
-<strong>Mod_rewrite</strong> must be enabled on your server to use clean URLs.';
 $string['confirmdeletepage'] = 'Are you sure you want to delete the page \'{$a}\'?';
+$string['contenthtml'] = 'Content HTML';
+$string['contenthtml_description'] = 'Raw HTML Content';
+$string['contenthtml_description_help'] = 'Enter raw HTML content that will be displayed directly on the page. This content will not be processed by the editor and will be rendered as-is. Use with caution as it can affect page layout and security.';
+$string['contenthtml_placeholder'] = 'Enter raw HTML content here...';
 $string['custompage_title'] = 'Page Management';
 $string['delete'] = "Remove";
 $string['edit'] = "Modify";
@@ -65,7 +67,7 @@ $string['label_required'] = "Mandatory Field";
 $string['managepages'] = "Manage Pages";
 $string['menu_name'] = 'Friendly URL';
 $string['menu_name_description'] = 'Friendly URL Description';
-$string['menu_name_description_help'] = 'Provide a user-friendly URL for the page. Use only letters, numbers, and hyphens. This will replace the default link structure. For example: <strong>about-us</strong> will result in http://URL/<strong>about-us</strong>';
+$string['menu_name_description_help'] = 'Provide a URL slug for the page (letters, numbers, hyphen, underscore only; invalid characters are removed on save). Web server rewrite rules must map requests such as <strong>about-us</strong> to this plugin\'s viewer if you use root-level URLs.';
 $string['metaauthor'] = 'Meta Author';
 $string['metaauthor_description'] = 'Meta Author Description';
 $string['metaauthor_description_help'] = 'Provide a meta author for the page. This will be used to identify the author of the page.';
@@ -105,8 +107,7 @@ $string['onlyloggedin_description_help'] = "<ul>
     <li>Guest users will see a message that the page is only visible to logged in users.</li>
 </ul>";
 $string['page'] = 'Page';
-$string['page:addpages'] = 'Add Pages';
-$string['page_accesslevel'] = "Required Capability";
+$string['page:addpages'] = 'Add and edit custom site pages (trusted HTML, raw head meta, and Content HTML—declared as RISK_XSS). The default course creator role can perform this site-wide; assign only to roles that should be able to inject arbitrary markup for all visitors.';
 $string['page_content'] = 'Content of the Page';
 $string['page_content_description'] = 'Enter the content for the page here.';
 $string['page_date'] = 'Publication Date';
@@ -117,12 +118,10 @@ $string['page_parent'] = 'Parent Page';
 $string['pagecontent'] = 'Content of the Page';
 $string['pagecontent_description'] = "Content for the Page";
 $string['pagecontent_description_help'] = "Provide the content for the page.";
-$string['contenthtml'] = 'Content HTML';
-$string['contenthtml_description'] = 'Raw HTML Content';
-$string['contenthtml_description_help'] = 'Enter raw HTML content that will be displayed directly on the page. This content will not be processed by the editor and will be rendered as-is. Use with caution as it can affect page layout and security.';
 $string['pagedate'] = "Page Publication Date";
 $string['pagedate_description'] = 'Select the date when this page will be published - a future date will restrict access until that date.';
 $string['pagedate_description_help'] = 'Select the date for publishing this page - access will be restricted until the specified date.';
+$string['pagename_placeholder'] = 'Enter the page name';
 $string['pagesetup_heading'] = 'Page Setup Heading';
 $string['pagesetup_title'] = 'Page Setup Title';
 $string['pdfmanual'] = "PDF User Manual";
@@ -131,7 +130,7 @@ $string['placeholder_text'] = "Placeholder Text Example";
 $string['pleasefillin'] = 'Please complete the field: {$a}.';
 $string['pleasefillinnumber'] = 'Please enter a number for: {$a}.';
 $string['pleaseselect'] = 'Please select an option from the list.';
-$string['pluginname'] = 'Custom Pages by RoseaThemes (1.0.7)';
+$string['pluginname'] = 'Custom Pages by RoseaThemes (1.0.9)';
 $string['pluginsettings'] = 'Plugin Settings';
 $string['pluginsettings_managepages'] = 'Manage Pages Settings';
 $string['privacy:metadata'] = 'The local pages plugin does not store any personal data.';

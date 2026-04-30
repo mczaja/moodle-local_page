@@ -54,12 +54,6 @@ if ($deletepage !== 0) {
     redirect(new moodle_url('/local/page/pages.php'));
 }
 
-// Set the admin navigation for users with site config capability.
-if (has_capability('moodle/site:config', $context)) {
-    require_once($CFG->libdir . '/adminlib.php');
-    admin_externalpage_setup('Manage Pages');
-}
-
 // Get the renderer for this page.
 $renderer = $PAGE->get_renderer('local_page');
 

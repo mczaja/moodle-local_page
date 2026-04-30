@@ -33,11 +33,10 @@ namespace local_page;
  * Provides functionality for managing custom pages: create, update, load.
  */
 class custompage {
-
     /**
      * @var \stdClass The data object containing page properties.
      */
-    private $_data;
+    private $pagedata;
 
     /**
      * Constructor.
@@ -45,7 +44,7 @@ class custompage {
      * @param \stdClass $data The page data object.
      */
     public function __construct(\stdClass $data) {
-        $this->_data = $data;
+        $this->pagedata = $data;
     }
 
     /**
@@ -92,7 +91,7 @@ class custompage {
      * @return mixed The property value or null if not found.
      */
     public function __get($item) {
-        return $this->_data->$item ?? null;
+        return $this->pagedata->$item ?? null;
     }
 
     /**
@@ -124,7 +123,7 @@ class custompage {
             $data->pagecontent = '';
         }
 
-        // Initialize contenthtml field if not set
+        // Initialize contenthtml field if not set.
         if (!isset($data->contenthtml)) {
             $data->contenthtml = '';
         }
@@ -162,8 +161,9 @@ class custompage {
             $data = $DB->get_record_sql(
                 "SELECT * FROM {local_page}
                  WHERE menuname = ? AND deleted = 0
-                 ORDER BY id DESC LIMIT 1",
-                [$menuname]
+                 ORDER BY id DESC",
+                [$menuname],
+                IGNORE_MULTIPLE
             );
         }
 
@@ -178,7 +178,7 @@ class custompage {
             $data->pagecontent = '';
         }
 
-        // Initialize contenthtml field if not set
+        // Initialize contenthtml field if not set.
         if (!isset($data->contenthtml)) {
             $data->contenthtml = '';
         }

@@ -44,7 +44,6 @@ use local_page\output\page_content;
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class local_page_renderer extends plugin_renderer_base {
-
     /**
      * @var array
      */
@@ -129,93 +128,42 @@ class local_page_renderer extends plugin_renderer_base {
      * @return mixed
      */
     public function showpage($page) {
-        global $DB, $CFG;
-        require_once($CFG->libdir . '/accesslib.php');
+        global $CFG;
+        require_once($CFG->dirroot . '/local/page/lib.php');
 
-        $context = \context_system::instance();
-        $canaccess = true;
-        if (!empty($page->accesslevel) && trim($page->accesslevel) != '') {
-            $canaccess = false;        // Page Has level Requirements - check rights.
-            $levels = explode(",", $page->accesslevel);
-            foreach ($levels as $key => $level) {
-                if ($canaccess != true) {
-                    if (stripos($level, "!") !== false) {
-                        $level = str_replace("!", "", $level);
-                        $canaccess = has_capability(trim($level), $context) ? false : true;
-                    } else {
-                        $canaccess = has_capability(trim($level), $context) ? true : false;
-                    }
-                }
-            }
-        }
-
-        // Initialize permissions to true, assuming access is granted.
-        $permissions = true;
-        // Check if the page is restricted to logged-in users.
-        if ($page->onlyloggedin == 1) {
-            // Set permissions to true only if the user is logged in and not a guest.
-            $permissions = isloggedin() && !isguestuser();
-        }
-
-        // Check if the user has access to the page and if the page date is valid or if the user is a site admin.
-        // Check if user has access based on time constraints, status, permissions, or admin status.
-        if ($page->pagedate > 0 && $page->enddate > 0) {
-            // Both start and end dates are set.
-            $istimevalid = $page->pagedate <= time() && $page->enddate >= time() && $page->status == 'live' && $permissions;
-        } else if ($page->pagedate > 0 && $page->enddate <= 0) {
-            // Only start date is set.
-            $istimevalid = $page->pagedate <= time() && $page->status == 'live' && $permissions;
-        } else if ($page->pagedate <= 0 && $page->enddate > 0) {
-            // Only end date is set.
-            $istimevalid = $page->enddate >= time() && $page->status == 'live' && $permissions;
-        } else {
-            // No dates set, check if status is live.
-            $istimevalid = $page->status == 'live' ? $permissions : false;
-        }
-        $isadmin = has_capability('moodle/site:config', $context);
-
-        if (($permissions && $istimevalid) || $isadmin) {
-            $today = time(); // Get the current timestamp.
-            // Fetch records from the database for pages that are not deleted and are of a specific type.
-            $records = $DB->get_records_sql("SELECT * FROM {local_page} WHERE deleted=0 " .
-                "AND pagedate <=? ORDER BY pagename", [$page->id, $today]);
-            $form = ''; // Initialize the form variable.
-
-            // Format the page content to prevent XSS attacks.
-            $pagecontent = format_text(
-                $this->adduserdata($page->pagecontent),
-                FORMAT_HTML,
-                ['trusted' => true, 'noclean' => true]
-            );
-
-            // Add content HTML if available (raw HTML content).
-            $contenthtml = '';
-            if (!empty($page->contenthtml)) {
-                $contenthtml = $this->adduserdata($page->contenthtml);
-            }
-
-            // Replace placeholders in the page content with the actual form content.
-            $content = str_replace(["#form#", "{form}"], [$form, $form], $pagecontent);
-            
-            // Combine regular content with raw HTML content.
-            $finalcontent = $content . $contenthtml;
-            
-            $pagecontentobj = new page_content(true, $finalcontent);
-            return $this->render_page_content($pagecontentobj);
-        } else {
+        if (!local_page_user_can_view_page($page)) {
             // Return a no access message if the user does not have permission.
             $noaccessmsg = get_string('noaccess', 'local_page');
             $pagecontentobj = new page_content(false, '', $noaccessmsg);
             return $this->render_page_content($pagecontentobj);
         }
+
+        $form = '';
+
+        // Format the page content to prevent XSS attacks.
+        $pagecontent = format_text(
+            $this->adduserdata($page->pagecontent),
+            FORMAT_HTML,
+            ['trusted' => true, 'noclean' => true]
+        );
+        // Add content HTML if available (raw HTML content).
+        $contenthtml = '';
+        if (!empty($page->contenthtml)) {
+            $contenthtml = $this->adduserdata($page->contenthtml);
+        }
+        // Replace placeholders in the page content with the actual form content.
+        $content = str_replace(["#form#", "{form}"], [$form, $form], $pagecontent);
+        // Combine regular content with raw HTML content.
+        $finalcontent = $content . $contenthtml;
+        $pagecontentobj = new page_content(true, $finalcontent);
+        return $this->render_page_content($pagecontentobj);
     }
 
     /**
      * Replaces user data placeholders in content with actual user information
      *
-     * This method takes content containing placeholders in the format {username}, {email}, etc.
-     * and replaces them with the current user's data. If user is not logged in, admin/guest
-     * user data is used instead.
+     * Only an explicit allow-list of placeholders is supported (e.g. {firstname}, {email});
+     * authentication and other sensitive user fields are never substituted.
      *
      * @param string $data The content containing user data placeholders
      * @return string The content with placeholders replaced with actual user data
@@ -223,27 +171,25 @@ class local_page_renderer extends plugin_renderer_base {
     public function adduserdata($data) {
         global $USER, $DB;
 
-        // Determine which user object to use based on login status.
-        // Note: requires lib/accesslib.php to be included for these functions.
         if (isloggedin() && !isguestuser()) {
-            // Use current logged-in user.
             $usr = $USER;
         } else {
-            // Fall back to admin/guest user (id=1).
-            // Only fetch necessary fields with proper error handling.
             $usr = $DB->get_record('user', ['id' => 1], '*', MUST_EXIST);
         }
 
-        // Iterate through all user properties and replace matching placeholders.
-        foreach ((array)$usr as $key => $details) {
-            // Skip non-scalar values (arrays, objects) as they can't be directly inserted.
-            if (is_scalar($details)) {
-                $placeholder = '{' . $key . '}';
-                if (strpos($data, $placeholder) !== false) {
-                    // Use Moodle's s() function to escape the value for security.
-                    $data = str_replace($placeholder, s($details), $data);
-                }
+        $allowedfields = ['firstname', 'lastname', 'email', 'username', 'idnumber', 'city', 'country'];
+        foreach ($allowedfields as $key) {
+            if (!isset($usr->$key) || !is_scalar($usr->$key)) {
+                continue;
             }
+            $placeholder = '{' . $key . '}';
+            if (strpos($data, $placeholder) !== false) {
+                $data = str_replace($placeholder, s($usr->$key), $data);
+            }
+        }
+
+        if (strpos($data, '{fullname}') !== false) {
+            $data = str_replace('{fullname}', s(fullname($usr)), $data);
         }
 
         return $data;
@@ -287,37 +233,7 @@ class local_page_renderer extends plugin_renderer_base {
             if (get_config('local_page', 'additionalhead')) {
                 $recordpage->meta = $data->meta;
             }
-            $recordpage->menuname = strtolower(str_replace([
-                " ",
-                "/",
-                "\\",
-                "'",
-                '"',
-                ";",
-                "~",
-                "?",
-                "&",
-                "@",
-                "#",
-                "$",
-                "%",
-                "^",
-                "*",
-                "(",
-                ")",
-                "+",
-                "=",
-                ".",
-                ":",
-                "<",
-                ">",
-                "{",
-                "}",
-                "[",
-                "]",
-                "|",
-                "!",
-            ], "", trim($data->menuname)));
+            $recordpage->menuname = strtolower(trim((string) $data->menuname));
             $recordpage->accesslevel = $data->accesslevel;
             $recordpage->pagedate = $data->pagedate;
             $recordpage->enddate = $data->enddate;
@@ -334,7 +250,7 @@ class local_page_renderer extends plugin_renderer_base {
             $recordpage->pagecontent = $savedpagecontent;
             $result = $page->update($recordpage);
             if ($result && $result > 0) {
-                $options = ['subdirs' => 0, 'maxbytes' => 204800, 'maxfiles' => 1, 'accepted_types' => '*'];
+                $options = local_page_ogimage_filemanager_options();
                 if (isset($data->ogimage_filemanager)) {
                     file_postupdate_standard_filemanager($data, 'ogimage', $options, $context, 'local_page', 'ogimage', $result);
                 }

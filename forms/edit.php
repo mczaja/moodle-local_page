@@ -42,11 +42,6 @@ require_once(dirname(__FILE__) . '/../lib.php');
  */
 class pages_edit_product_form extends moodleform {
     /**
-     * @var $_pagedata Holds the data of the page being edited.
-     */
-    public $_pagedata;
-
-    /**
      * @var $callingpage Holds the ID of the current page being edited.
      */
     public $callingpage;
@@ -58,8 +53,6 @@ class pages_edit_product_form extends moodleform {
      */
     public function __construct($page) {
         if ($page) {
-            // Initialize page data and calling page ID.
-            $this->_pagedata = $page->pagedata;
             $this->callingpage = $page->id;
         }
         parent::__construct(); // Call the parent constructor.
@@ -90,7 +83,7 @@ class pages_edit_product_form extends moodleform {
         $defaults->pagecontent['format'] = FORMAT_HTML; // Set the format for the content.
 
         // Options for the file manager for the Open Graph image.
-        $options = ['maxbytes' => 204800, 'maxfiles' => 1, 'accepted_types' => ['jpg, png']];
+        $options = local_page_ogimage_filemanager_options();
 
         // Prepare the file manager for the Open Graph image.
         $defaults->ogimage = file_prepare_standard_filemanager(
@@ -147,26 +140,54 @@ class pages_edit_product_form extends moodleform {
         $mform->addElement('header', 'details', get_string('details', 'moodle'));
 
         // Select Live or Draft.
-        $mform->addElement('select', 'status', get_string('status', 'local_page'),
-            ['live' => 'Live', 'draft' => 'Draft', 'archived' => 'Archived']);
+        $mform->addElement(
+            'select',
+            'status',
+            get_string('status', 'local_page'),
+            [
+                'live' => get_string('status_live', 'local_page'),
+                'draft' => get_string('status_draft', 'local_page'),
+                'archived' => get_string('status_archived', 'local_page'),
+            ]
+        );
         $mform->setDefault('status', 'live');
-        $mform->setType('status', PARAM_TEXT); // Set the type for the status field.
+        $mform->setType('status', PARAM_ALPHA);
 
         // Hidden for non-logged in users.
-        $mform->addElement('select', 'onlyloggedin', get_string('onlyloggedin', 'local_page'), ['0' => 'No', '1' => 'Yes']);
+        $mform->addElement(
+            'select',
+            'onlyloggedin',
+            get_string('onlyloggedin', 'local_page'),
+            [
+                '0' => get_string('no'),
+                '1' => get_string('yes'),
+            ]
+        );
         $mform->setDefault('onlyloggedin', '0');
         $mform->setType('onlyloggedin', PARAM_INT); // Set the type for the nonloggedin field.
         $mform->addHelpButton('onlyloggedin', 'onlyloggedin_description', 'local_page'); // Add help button.
 
         // Text area for the page name.
-        $mform->addElement('textarea', 'pagename', get_string('title', 'h5p'), ['placeholder' => 'Enter page name']);
+        $mform->addElement(
+            'textarea',
+            'pagename',
+            get_string('page_name', 'local_page'),
+            ['placeholder' => get_string('pagename_placeholder', 'local_page')]
+        );
         $mform->setType('pagename', PARAM_TEXT); // Set the type for the page name.
 
         // Select Hide Title.
-        $mform->addElement('select', 'hidetitle', get_string('hidetitle', 'local_page'),
-        ['no' => 'No', 'yes' => 'Yes']);
+        $mform->addElement(
+            'select',
+            'hidetitle',
+            get_string('hidetitle', 'local_page'),
+            [
+                'no' => get_string('no'),
+                'yes' => get_string('yes'),
+            ]
+        );
         $mform->setDefault('hidetitle', 'no');
-        $mform->setType('hidetitle', PARAM_TEXT); // Set the type for the hidetitle field.
+        $mform->setType('hidetitle', PARAM_ALPHA);
 
         // Date selector for the page date.
         $mform->addElement(
@@ -175,7 +196,7 @@ class pages_edit_product_form extends moodleform {
             get_string('form_field_date', 'local_page'),
             ['optional' => true]
         );
-        $mform->setType('pagedate', PARAM_TEXT); // Set the type for the date field.
+        $mform->setType('pagedate', PARAM_INT);
         $mform->addHelpButton('pagedate', 'pagedate_description', 'local_page'); // Add help button.
 
         // End date selector for the page date.
@@ -185,17 +206,17 @@ class pages_edit_product_form extends moodleform {
             get_string('form_field_enddate', 'local_page'),
             ['optional' => true]
         );
-        $mform->setType('enddate', PARAM_TEXT); // Set the type for the date field.
+        $mform->setType('enddate', PARAM_INT);
         $mform->addHelpButton('enddate', 'form_field_enddate_description', 'local_page'); // Add help button.
 
         // Text field for access level.
-        $mform->addElement('text', 'accesslevel', get_string('requiredcapability', 'webservice'));
-        $mform->addHelpButton('accesslevel', 'requiredcapability', 'webservice');
+        $mform->addElement('text', 'accesslevel', get_string('accesslevel', 'local_page'));
+        $mform->addHelpButton('accesslevel', 'accesslevel', 'local_page');
         $mform->setType('accesslevel', PARAM_TEXT); // Set the type for access level.
 
         // Text field for menu name.
         $mform->addElement('text', 'menuname', get_string('menu_name', 'local_page'));
-        $mform->setType('menuname', PARAM_TEXT); // Set the type for menu name.
+        $mform->setType('menuname', PARAM_ALPHANUMEXT);
         $mform->addHelpButton('menuname', 'menu_name_description', 'local_page'); // Add help button.
 
         // Page Display.
@@ -217,12 +238,19 @@ class pages_edit_product_form extends moodleform {
         $mform->setType('pagecontent', PARAM_RAW); // Set the type for page content.
 
         // Content HTML field.
-        $mform->addElement('textarea', 'contenthtml', get_string('contenthtml', 'local_page'), 
-            ['rows' => 10, 'cols' => 80, 'placeholder' => 'Enter raw HTML content here...']);
+        $mform->addElement(
+            'textarea',
+            'contenthtml',
+            get_string('contenthtml', 'local_page'),
+            [
+                'rows' => 10,
+                'cols' => 80,
+                'placeholder' => get_string('contenthtml_placeholder', 'local_page'),
+            ]
+        );
         $mform->setType('contenthtml', PARAM_RAW); // Set the type for content HTML.
         $mform->addHelpButton('contenthtml', 'contenthtml_description', 'local_page'); // Add help button.
 
-        
         // Head Content.
         $mform->addElement('header', 'htmlhead', get_string('additionalhtml', 'admin'));
 
@@ -257,10 +285,7 @@ class pages_edit_product_form extends moodleform {
         }
 
         // File manager for Open Graph image.
-        $options['subdirs'] = 0;
-        $options['maxbytes'] = 204800;
-        $options['maxfiles'] = 1;
-        $options['accepted_types'] = ['jpg', 'jpeg', 'png', 'svg', 'webp'];
+        $options = local_page_ogimage_filemanager_options();
         $mform->addElement('filemanager', 'ogimage_filemanager', get_string('edit_ogimage', 'local_page'), null, $options);
 
         // Form Buttons.
@@ -269,17 +294,5 @@ class pages_edit_product_form extends moodleform {
         // Hidden field for page ID.
         $mform->addElement('hidden', 'id', null);
         $mform->setType('id', PARAM_INT); // Set the type for the ID field.
-    }
-
-    /**
-     * Validate the form data.
-     *
-     * @param mixed $data The submitted data.
-     * @param mixed $files The uploaded files.
-     * @return mixed Validation errors, if any.
-     */
-    public function validation($data, $files) {
-        $errors = parent::validation($data, $files); // Call parent validation method.
-        return $errors; // Return any validation errors.
     }
 }

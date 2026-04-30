@@ -38,7 +38,6 @@ use moodle_url;
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class pages_list implements renderable, templatable {
-
     /** @var array Array of page records */
     protected $pages;
 

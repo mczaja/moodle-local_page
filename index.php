@@ -39,10 +39,10 @@ $menuname = optional_param('menuname', '', PARAM_TEXT);
 
 // Load the custom page object using the page ID or menuname.
 if (!empty($menuname)) {
-    // Load by menuname
+    // Load by menuname.
     $custompage = \local_page\custompage::load_by_menuname($menuname);
 } else {
-    // Load by ID
+    // Load by ID.
     $custompage = \local_page\custompage::load($pageid);
 }
 
@@ -50,7 +50,7 @@ if (!empty($menuname)) {
 $context = context_system::instance(); // Get the system context.
 $PAGE->set_context($context); // Set the context for the page.
 
-// Set the URL based on whether we're using menuname or ID
+// Set the URL based on whether we are using menuname or ID.
 if (!empty($menuname)) {
     $PAGE->set_url(new moodle_url('/' . $menuname)); // Define the URL for the page using menuname.
 } else {
@@ -78,10 +78,8 @@ $metatags = [
 
 // Loop through each meta tag and its content.
 foreach ($metatags as $name => $content) {
-    // Check if the content is not empty.
     if (!empty($content)) {
-        // Append the meta tag to the $headseo string, using format_string to properly escape the content for HTML.
-        $headseo .= '<meta name="' . $name . '" content="' . format_string($content) . '" />' . "\n";
+        $headseo .= html_writer::empty_tag('meta', ['name' => $name, 'content' => $content]) . "\n";
     }
 }
 
@@ -102,13 +100,13 @@ if ($files) {
             $file->get_filename(),
             false // Do not force download.
         );
-        $headseo .= '<meta property="og:image" content="' . $imageurl->out(false) . '" />' . "\n";
+        $headseo .= html_writer::empty_tag('meta', ['property' => 'og:image', 'content' => $imageurl->out(false)]) . "\n";
     }
 }
 
 // Build the canonical URL for the page.
 if (!empty($menuname) && !empty($custompage->menuname)) {
-    // Use the root-level URL format
+    // Use the root-level URL format.
     $canonicalurl = new moodle_url('/' . $custompage->menuname);
 } else {
     // Use standard URL format with ID parameter.
@@ -116,16 +114,15 @@ if (!empty($menuname) && !empty($custompage->menuname)) {
 }
 
 // Add standard Open Graph metadata for social media sharing.
-$headseo .= '<meta property="og:site_name" content="' . format_string($SITE->fullname) . '" />' . "\n";
-$headseo .= '<meta property="og:type" content="website" />' . "\n";
-$headseo .= '<meta property="og:title" content="' . format_string($PAGE->title) . '" />' . "\n";
-$headseo .= '<meta property="og:url" content="' . $canonicalurl->out(false) . '" />' . "\n";
+$headseo .= html_writer::empty_tag('meta', ['property' => 'og:site_name', 'content' => $SITE->fullname]) . "\n";
+$headseo .= html_writer::empty_tag('meta', ['property' => 'og:type', 'content' => 'website']) . "\n";
+$headseo .= html_writer::empty_tag('meta', ['property' => 'og:title', 'content' => $PAGE->title]) . "\n";
+$headseo .= html_writer::empty_tag('meta', ['property' => 'og:url', 'content' => $canonicalurl->out(false)]) . "\n";
 
-// Additional HTML head content.
-$additionalhead = $custompage->meta;
-
-// Set the additional HTML head content in the global configuration.
-$CFG->additionalhtmlhead = $headseo . $additionalhead;
+// Additional HTML head content: append to site-wide Additional HTML; page meta only if enabled.
+$existing = !empty($CFG->additionalhtmlhead) ? $CFG->additionalhtmlhead . "\n" : '';
+$additionalhead = get_config('local_page', 'additionalhead') ? (string) $custompage->meta : '';
+$CFG->additionalhtmlhead = $existing . $headseo . $additionalhead;
 
 // Set the page layout to use.
 $PAGE->set_pagelayout('base'); // Set the page layout.
@@ -144,7 +141,7 @@ if ($custompage->hidetitle == 'no') {
 $PAGE->set_pagetype('local-page-id-' . $pageid); // Optional.
 
 // Add a link to the custom pages list in the navbar if the user has the necessary capability.
-if (has_capability('local/page:addpages', $context) || is_siteadmin()) {
+if (has_capability('local/page:addpages', $context)) {
     $PAGE->add_body_class('local-page-status-' . $statusbadge);
 }
 
@@ -163,16 +160,14 @@ if ($pageid) {
 $renderer = $PAGE->get_renderer('local_page');
 
 // Output the page header, content, and footer.
-$contenthtml = $custompage->contenthtml;
-
 echo $OUTPUT->header(); // Display the page header.
 echo $OUTPUT->blocks('side-pre');
-echo $renderer->showpage($custompage) . $contenthtml; // Render and display the custom page content.
+echo $renderer->showpage($custompage); // Render and display the custom page content.
 
 
 
 // Check if the user has the capability to add pages or is a site admin.
-if (has_capability('local/page:addpages', $context) || is_siteadmin()) {
+if (has_capability('local/page:addpages', $context)) {
     // Create a link to the edit page with an icon and the text 'edit'.
     $footerbtn = html_writer::div(
         html_writer::link(

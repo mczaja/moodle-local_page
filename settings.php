@@ -39,14 +39,6 @@ if ($hassiteconfig) {
     // Make a container for all of the settings for the settings page.
     $settings = [];
 
-    // Setting to control the URLs used for created pages.
-    $settings[] = new \admin_setting_configcheckbox(
-        'local_page/cleanurl_enabled',
-        get_string('cleanurl_enabled', 'local_page'),
-        get_string('cleanurl_enabled_description', 'local_page'),
-        0
-    );
-
     // Setting to show text box for HTML head on edit page and contents on view page.
     $settings[] = new \admin_setting_configcheckbox(
         'local_page/additionalhead',
@@ -63,11 +55,11 @@ if ($hassiteconfig) {
     // Add the settings page to the nav tree.
     $ADMIN->add('local_page', $settingspage);
 
-    // Add the 'Manage pages' page to the nav tree.
+    // Add the 'Manage pages' page to the nav tree (first argument = stable nodename for admin_externalpage_setup).
     $ADMIN->add(
         'local_page',
         new \admin_externalpage(
-            get_string('managepages', 'local_page'),
+            'local_page_managepages',
             get_string('pluginsettings_managepages', $componentname),
             new \moodle_url('/local/page/pages.php'),
             'local/page:addpages'
@@ -81,7 +73,7 @@ if ($hassiteconfig) {
     $ADMIN->add(
         'local_page',
         new \admin_externalpage(
-            get_string('managepages', 'local_page'),
+            'local_page_managepages',
             get_string('pluginsettings_managepages', $componentname),
             new \moodle_url('/local/page/pages.php'),
             'local/page:addpages'
