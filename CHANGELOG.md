@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## [1.0.9] - 2026-04-29
+## [1.0.8] - 2026-04-29
 
 ### Security
 - Page visibility and file access aligned so hidden or draft content is not leaked.

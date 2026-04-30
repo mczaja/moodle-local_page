@@ -26,7 +26,7 @@
 defined('MOODLE_INTERNAL') || die;
 
 $plugin->requires   = 2024100704; // Min. Moodle 4.5.
-$plugin->version    = 2026042901;
-$plugin->release    = 'v1.0.9';
+$plugin->version    = 2026043001;
+$plugin->release    = 'v1.0.8';
 $plugin->maturity   = MATURITY_STABLE;
 $plugin->component  = 'local_page';
