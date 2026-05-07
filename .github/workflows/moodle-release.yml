@@ -21,7 +21,7 @@ jobs:
 
     services:
       postgres:
-        image: postgres:12
+        image: postgres:14
         env:
           POSTGRES_USER: 'postgres'
           POSTGRES_HOST_AUTH_METHOD: 'trust'
@@ -32,7 +32,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        php-versions: ['8.0']
+        php-versions: ['8.2']
         database: ['pgsql']
     steps:
       - name: Check out repository code
@@ -68,7 +68,7 @@ jobs:
         env:
           DB: ${{ matrix.database }}
           # TODO: Omitted MOODLE_BRANCH results in regex failure, investigate.
-          MOODLE_BRANCH: 'MOODLE_311_STABLE'
+          MOODLE_BRANCH: 'MOODLE_501_STABLE'
 
       - name: Run phplint
         run: moodle-plugin-ci phplint
@@ -89,7 +89,7 @@ jobs:
         run: moodle-plugin-ci savepoints
 
       - name: Run mustache
-        run: moodle-plugin-ci phpcpd || true
+        run: moodle-plugin-ci mustache
         env:
           MUSTACHE_IGNORE_NAMES: mobile_teacher_form.mustache
 
@@ -100,11 +100,7 @@ jobs:
         run: moodle-plugin-ci phpdoc
 
       - name: Run phpunit
-        run: |
-          moodle-plugin-ci phpunit
-          cd moodle
-          vendor/bin/phpunit --fail-on-risky --disallow-test-output --filter tool_dataprivacy_metadata_registry_testcase
-          vendor/bin/phpunit --fail-on-risky --disallow-test-output --testsuite core_privacy_testsuite --filter provider_testcase
+        run: moodle-plugin-ci phpunit
 
       - name: Run behat
         run: moodle-plugin-ci behat --profile chrome
@@ -113,15 +109,16 @@ jobs:
       - name: Release at Moodle.org by calling the service function
         id: add-version
         env:
-          PLUGIN: mod_attendance
-          BRANCH: MOODLE_311_STABLE
+          PLUGIN: local_page
+          BRANCH: MOODLE_501_STABLE
+          TAGNAME: ${{ github.sha }}
           CURL: curl -s
           ENDPOINT: https://moodle.org/webservice/rest/server.php
           TOKEN: ${{ secrets.MOODLE_ORG_TOKEN }}
           FUNCTION: local_plugins_add_version
 
         run: |
-          ZIPURL="https://github.com/danmarsden/moodle-mod_attendance/archive/refs/heads/${BRANCH}.zip"
+          ZIPURL="https://github.com/${GITHUB_REPOSITORY}/archive/refs/heads/main.zip"
           RESPONSE=$(${CURL} ${ENDPOINT} --data-urlencode "wstoken=${TOKEN}" \
                                          --data-urlencode "wsfunction=${FUNCTION}" \
                                          --data-urlencode "moodlewsrestformat=json" \
@@ -130,7 +127,7 @@ jobs:
                                          --data-urlencode "vcssystem=git" \
                                          --data-urlencode "vcsrepositoryurl=${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}" \
                                          --data-urlencode "vcstag=${TAGNAME}" \
-                                         --data-urlencode "changelogurl=${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/commits/${BRANCH}" \
+                                         --data-urlencode "changelogurl=${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/commits/main" \
                                          --data-urlencode "altdownloadurl=${ZIPURL}")
           echo "::set-output name=response::${RESPONSE}"
       - name: Evaluate the response

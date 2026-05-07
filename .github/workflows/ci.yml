@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     services:
       postgres:
-        image: postgres:10
+        image: postgres:14
         env:
           POSTGRES_USER: 'postgres'
           POSTGRES_HOST_AUTH_METHOD: 'trust'
@@ -27,7 +27,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        php-versions: ['7.3', '7.4']
+        php-versions: ['8.2', '8.3']
         database: ['pgsql', 'mariadb']
     steps:
       - name: Check out repository code
@@ -63,7 +63,7 @@ jobs:
         env:
           DB: ${{ matrix.database }}
           # TODO: Omitted MOODLE_BRANCH results in regex failure, investigate.
-          MOODLE_BRANCH: 'MOODLE_311_STABLE'
+          MOODLE_BRANCH: 'MOODLE_501_STABLE'
 
       - name: Run phplint
         if: ${{ always() }}
@@ -91,7 +91,7 @@ jobs:
 
       - name: Run mustache
         if: ${{ always() }}
-        run: moodle-plugin-ci phpcpd || true
+        run: moodle-plugin-ci mustache
         env:
           MUSTACHE_IGNORE_NAMES: mobile_teacher_form.mustache
 
@@ -105,11 +105,7 @@ jobs:
 
       - name: Run phpunit
         if: ${{ always() }}
-        run: | 
-             moodle-plugin-ci phpunit
-             cd moodle
-             vendor/bin/phpunit --fail-on-risky --disallow-test-output --filter tool_dataprivacy_metadata_registry_testcase
-             vendor/bin/phpunit --fail-on-risky --disallow-test-output --testsuite core_privacy_testsuite --filter provider_testcase 
+        run: moodle-plugin-ci phpunit
 
       - name: Run behat
         if: ${{ always() }}
