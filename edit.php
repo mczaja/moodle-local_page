@@ -53,6 +53,21 @@ $renderer = $PAGE->get_renderer('local_page'); // Get the renderer for the local
 $pagetoedit = \local_page\custompage::load($pageid, true); // Load the page to edit.
 $renderer->save_page($pagetoedit); // Save the page using the renderer.
 
+// Theme XY Simple Content Builder: wire AMD + overlay UI to the "Content HTML" textarea (id_contenthtml).
+$contentbuildersupplement = '';
+if (core_component::get_component_directory('theme_xy')) {
+    require_once($CFG->dirroot . '/theme/xy/lib.php');
+    if (function_exists('theme_xy_require_simple_content_builder')) {
+        theme_xy_require_simple_content_builder();
+    }
+    if (function_exists('theme_xy_simple_content_builder_template_context')) {
+        $contentbuildersupplement = $OUTPUT->render_from_template(
+            'theme_xy/contentbuilder/builder',
+            theme_xy_simple_content_builder_template_context()
+        );
+    }
+}
+
 echo $OUTPUT->header(); // Output the page header.
 
 // Display page title with back link.
@@ -79,6 +94,10 @@ echo html_writer::link(
     html_writer::tag('i', '', ['class' => 'fas fa-eye me-1']) . ' ' . get_string('preview', 'editor'),
     ['class' => 'btn btn-sm btn-success', 'target' => '_blank']
 );
+
+if ($contentbuildersupplement !== '') {
+    echo $contentbuildersupplement;
+}
 
 // Display the edit form.
 echo $renderer->edit_page($pagetoedit); // Output the edit form for the page.

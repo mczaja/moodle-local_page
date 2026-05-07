@@ -1,5 +1,16 @@
 # CHANGELOG
 
+## [1.0.9] - 2026-05-07
+
+### Added
+- On the page edit screen, when the **theme_xy** component is present, the **Simple Content Builder** UI and scripts are loaded so the **Content HTML** field (`id_contenthtml`) can be edited with the same builder as in theme admin (overlay, snippets). Without **theme_xy**, behaviour is unchanged.
+
+### Fixed
+- Users with the **local/page:addpages** capability can **preview** pages that are **draft** or **archived**, or outside the public **page date / end date** window, without needing **moodle/site:config**. Public visitors still only see **live** pages within the configured dates.
+- **Content HTML** output now runs **pluginfile** URL rewriting for viewers, so embedded files from the page content file area resolve correctly on the public page (same behaviour as the main HTML editor field).
+- **Content HTML** is no longer dropped when the stored value is the string **"0"** (PHP `empty()` edge case).
+- Saving and viewing **Content HTML** remains reliable when the main Moodle editor field is empty (pages that use only the raw HTML block).
+
 ## [1.0.8] - 2026-04-29
 
 ### Security

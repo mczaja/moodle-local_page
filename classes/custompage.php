@@ -140,6 +140,18 @@ class custompage {
             );
         }
 
+        if (!$editor && isset($data->contenthtml) && (string) $data->contenthtml !== '') {
+            $context = \context_system::instance();
+            $data->contenthtml = \file_rewrite_pluginfile_urls(
+                $data->contenthtml,
+                'pluginfile.php',
+                $context->id,
+                'local_page',
+                'pagecontent',
+                null
+            );
+        }
+
         return new custompage($data);
     }
 
@@ -187,6 +199,18 @@ class custompage {
             $context = \context_system::instance();
             $data->pagecontent = \file_rewrite_pluginfile_urls(
                 $data->pagecontent,
+                'pluginfile.php',
+                $context->id,
+                'local_page',
+                'pagecontent',
+                null
+            );
+        }
+
+        if (!$editor && isset($data->contenthtml) && (string) $data->contenthtml !== '') {
+            $context = \context_system::instance();
+            $data->contenthtml = \file_rewrite_pluginfile_urls(
+                $data->contenthtml,
                 'pluginfile.php',
                 $context->id,
                 'local_page',

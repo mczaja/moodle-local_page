@@ -146,9 +146,9 @@ class local_page_renderer extends plugin_renderer_base {
             FORMAT_HTML,
             ['trusted' => true, 'noclean' => true]
         );
-        // Add content HTML if available (raw HTML content).
+        // Add content HTML if available (raw HTML content). Avoid PHP empty() — it treats "0" as empty.
         $contenthtml = '';
-        if (!empty($page->contenthtml)) {
+        if ($page->contenthtml !== null && $page->contenthtml !== '') {
             $contenthtml = $this->adduserdata($page->contenthtml);
         }
         // Replace placeholders in the page content with the actual form content.

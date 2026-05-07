@@ -30,14 +30,51 @@
         "livepages": [
             {
                 "id": 1,
-                "name": "Live Page 1",
+                "name": "Live Page",
+                "confirmdeletemessage": "Are you sure you want to delete the page 'Live Page'?",
                 "status": "live",
-                ...
+                "cardbodyclass": "custompages-card-body rounded mb-3",
+                "statusbadge": "<span class=\"badge badge-sq bg-success\">Live</span>",
+                "restricted": false,
+                "editurl": "https://example.org/local/page/edit.php?id=1",
+                "pageurl": "https://example.org/local/page/?id=1",
+                "viewurl": "https://example.org/local/page/?id=1",
+                "deleteurl": "https://example.org/local/page/pages.php?pagedel=1&sesskey=abc123",
+                "menuname": "live-page",
+                "friendlyurl": "https://example.org/live-page"
             }
         ],
-        "draftpages": [...],
-        "archivedpages": [...],
-        "addpageurl": "/local/page/edit.php"
+        "draftpages": [
+            {
+                "id": 2,
+                "name": "Draft Page",
+                "confirmdeletemessage": "Are you sure you want to delete the page 'Draft Page'?",
+                "status": "draft",
+                "cardbodyclass": "custompages-card-body rounded mb-3 custompages-card-body--draft",
+                "statusbadge": "<span class=\"badge badge-sq bg-warning\">Draft</span>",
+                "restricted": false,
+                "editurl": "https://example.org/local/page/edit.php?id=2",
+                "pageurl": "https://example.org/local/page/?id=2",
+                "viewurl": "https://example.org/local/page/?id=2",
+                "deleteurl": "https://example.org/local/page/pages.php?pagedel=2&sesskey=abc123"
+            }
+        ],
+        "archivedpages": [
+            {
+                "id": 3,
+                "name": "Archived Page",
+                "confirmdeletemessage": "Are you sure you want to delete the page 'Archived Page'?",
+                "status": "archived",
+                "cardbodyclass": "custompages-card-body rounded mb-3 custompages-card-body--archived",
+                "statusbadge": "<span class=\"badge badge-sq bg-danger\">Archived</span>",
+                "restricted": false,
+                "editurl": "https://example.org/local/page/edit.php?id=3",
+                "pageurl": "https://example.org/local/page/?id=3",
+                "viewurl": "https://example.org/local/page/?id=3",
+                "deleteurl": "https://example.org/local/page/pages.php?pagedel=3&sesskey=abc123"
+            }
+        ],
+        "addpageurl": "https://example.org/local/page/edit.php"
     }
 }}
 <div class="custompages-list-wrapper">

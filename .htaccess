@@ -1,3 +1,5 @@
+# Scope: this directory only (/local/page/). It does not rewrite top-level friendly URLs
+# such as https://example.com/about-us — those need rules at the Moodle web root; see README.md.
 <IfModule mod_rewrite.c>
     RewriteEngine On
 

@@ -85,6 +85,12 @@ function local_page_user_can_view_page(object $page): bool {
         $permissions = isloggedin() && !isguestuser();
     }
 
+    // Same people who can edit custom pages may preview draft/archived/scheduled content
+    // (status and publish window still apply to everyone else).
+    if (has_capability('local/page:addpages', $context)) {
+        return $canaccess && $permissions;
+    }
+
     $now = time();
     if ($page->pagedate > 0 && $page->enddate > 0) {
         $istimevalid = $page->pagedate <= $now && $page->enddate >= $now && $page->status === 'live' && $permissions;
