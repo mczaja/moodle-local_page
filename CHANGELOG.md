@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## [1.0.10] - 2026-05-08
+
+### Changed
+- The **Simple Content Builder** helper on the page edit screen loads only when **theme_xy** is both **installed** (component and `contentbuilder/builder` Mustache present) and **active** for the current page (`$PAGE->theme` name is `xy`). If xy is installed but another theme is in use, the builder is not injected and the standard editor flow applies.
+
 ## [1.0.9] - 2026-05-07
 
 ### Added

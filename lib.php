@@ -30,6 +30,32 @@
 defined('MOODLE_INTERNAL') || die();
 
 /**
+ * Whether theme_xy Simple Content Builder (overlay, snippets incl. hero) can be wired on local page edit.
+ *
+ * Requires theme_xy installed and all builder assets present, and the {@see moodle_page} theme to actually be xy
+ * (default / user theme chain resolved for this page). If xy is installed but another theme such as a child theme
+ * is active, returns false — the overlay is omitted.
+ *
+ * @return bool
+ */
+function local_page_xy_simple_content_builder_is_available(): bool {
+    global $PAGE;
+
+    if (($PAGE->theme->name ?? '') !== 'xy') {
+        return false;
+    }
+
+    $dir = core_component::get_component_directory('theme_xy');
+    if (!$dir) {
+        return false;
+    }
+    if (!is_readable($dir . '/lib.php')) {
+        return false;
+    }
+    return is_readable($dir . '/templates/contentbuilder/builder.mustache');
+}
+
+/**
  * Shared options for the Open Graph image file manager (form definition, set_data, save).
  * SVG is excluded because ogimage URLs are anonymous-readable and image/svg+xml can execute script.
  *

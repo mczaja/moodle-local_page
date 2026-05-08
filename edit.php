@@ -53,9 +53,9 @@ $renderer = $PAGE->get_renderer('local_page'); // Get the renderer for the local
 $pagetoedit = \local_page\custompage::load($pageid, true); // Load the page to edit.
 $renderer->save_page($pagetoedit); // Save the page using the renderer.
 
-// Theme XY Simple Content Builder: wire AMD + overlay UI to the "Content HTML" textarea (id_contenthtml).
+// Theme XY Simple Content Builder: only when theme_xy is installed and builder templates exist (hero overlay, snippets).
 $contentbuildersupplement = '';
-if (core_component::get_component_directory('theme_xy')) {
+if (local_page_xy_simple_content_builder_is_available()) {
     require_once($CFG->dirroot . '/theme/xy/lib.php');
     if (function_exists('theme_xy_require_simple_content_builder')) {
         theme_xy_require_simple_content_builder();
