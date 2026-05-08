@@ -140,7 +140,7 @@ class custompage {
                 $context->id,
                 'local_page',
                 'pagecontent',
-                null
+                0
             );
         }
 
@@ -152,7 +152,7 @@ class custompage {
                 $context->id,
                 'local_page',
                 'pagecontent',
-                null
+                0
             );
         }
 
@@ -207,7 +207,7 @@ class custompage {
                 $context->id,
                 'local_page',
                 'pagecontent',
-                null
+                0
             );
         }
 
@@ -219,7 +219,7 @@ class custompage {
                 $context->id,
                 'local_page',
                 'pagecontent',
-                null
+                0
             );
         }
 

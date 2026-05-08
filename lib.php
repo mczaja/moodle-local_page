@@ -184,14 +184,24 @@ function local_page_pages_referencing_pagecontent_file(int $contextid, string $f
 
     $rel = trim($filepath, '/');
     $suffix = $rel === '' ? $filename : $rel . '/' . $filename;
+    $encodedparts = array_map('rawurlencode', array_values(array_filter(explode('/', $suffix), static function(string $part): bool {
+        return $part !== '';
+    })));
+    $encodedsuffix = implode('/', $encodedparts);
 
     $needles = [
         '@@PLUGINFILE@@/' . $suffix,
+        '@@PLUGINFILE@@/' . $encodedsuffix,
         '/pluginfile.php/' . $contextid . '/local_page/pagecontent/0/' . $suffix,
+        '/pluginfile.php/' . $contextid . '/local_page/pagecontent/0/' . $encodedsuffix,
         'pluginfile.php/' . $contextid . '/local_page/pagecontent/0/' . $suffix,
+        'pluginfile.php/' . $contextid . '/local_page/pagecontent/0/' . $encodedsuffix,
         $contextid . '/local_page/pagecontent/0/' . $suffix,
+        $contextid . '/local_page/pagecontent/0/' . $encodedsuffix,
         '/local_page/pagecontent/0/' . $suffix,
+        '/local_page/pagecontent/0/' . $encodedsuffix,
         'local_page/pagecontent/0/' . $suffix,
+        'local_page/pagecontent/0/' . $encodedsuffix,
     ];
     $encsuffix = rawurlencode($suffix);
     if ($encsuffix !== '') {
@@ -199,12 +209,23 @@ function local_page_pages_referencing_pagecontent_file(int $contextid, string $f
     }
 
     $fnesc = $DB->sql_like_escape($filename);
-    $sql = "SELECT * FROM {local_page} WHERE deleted = 0 AND ("
-        . $DB->sql_like('pagecontent', ':pc', false) . " OR " . $DB->sql_like('contenthtml', ':ch', false) . ")";
+    $encodedfilename = rawurlencode($filename);
+    $likesql = [
+        $DB->sql_like('pagecontent', ':pc', false),
+        $DB->sql_like('contenthtml', ':ch', false),
+    ];
     $params = [
         'pc' => '%' . $fnesc . '%',
         'ch' => '%' . $fnesc . '%',
     ];
+    if ($encodedfilename !== $filename) {
+        $fnencesc = $DB->sql_like_escape($encodedfilename);
+        $likesql[] = $DB->sql_like('pagecontent', ':pce', false);
+        $likesql[] = $DB->sql_like('contenthtml', ':che', false);
+        $params['pce'] = '%' . $fnencesc . '%';
+        $params['che'] = '%' . $fnencesc . '%';
+    }
+    $sql = "SELECT * FROM {local_page} WHERE deleted = 0 AND (" . implode(' OR ', $likesql) . ")";
 
     $candidates = $DB->get_recordset_sql($sql, $params);
     $matches = [];
@@ -281,11 +302,13 @@ function local_page_pluginfile($course, $birecordorcm, $context, $filearea, $arg
     $file = false;
 
     if ($filearea === 'pagecontent') {
+        $itemid = (int) array_shift($args);
+
         // Construct the file path from the remaining arguments.
         $filepath = $args ? '/' . implode('/', $args) . '/' : '/';
 
         // Attempt to retrieve the file from the pagecontent area.
-        $file = $fs->get_file($context->id, 'local_page', 'pagecontent', 0, $filepath, $filename);
+        $file = $fs->get_file($context->id, 'local_page', 'pagecontent', $itemid, $filepath, $filename);
 
         if ($file && !$file->is_directory()) {
             if (!local_page_user_can_serve_pagecontent_file((int) $context->id, $filepath, $filename)) {
