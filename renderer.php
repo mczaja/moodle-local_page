@@ -163,21 +163,25 @@ class local_page_renderer extends plugin_renderer_base {
      * Replaces user data placeholders in content with actual user information
      *
      * Only an explicit allow-list of placeholders is supported (e.g. {firstname}, {email});
-     * authentication and other sensitive user fields are never substituted.
+     * Logged-out and guest sessions use {@see guest_user()} (configured via $CFG->siteguest), never a hard-coded user id.
      *
      * @param string $data The content containing user data placeholders
      * @return string The content with placeholders replaced with actual user data
      */
     public function adduserdata($data) {
-        global $USER, $DB;
+        global $USER;
+
+        $allowedfields = ['firstname', 'lastname', 'email', 'username', 'idnumber', 'city', 'country'];
 
         if (isloggedin() && !isguestuser()) {
             $usr = $USER;
         } else {
-            $usr = $DB->get_record('user', ['id' => 1], '*', MUST_EXIST);
+            $usr = guest_user();
+            if (!$usr) {
+                return $data;
+            }
         }
 
-        $allowedfields = ['firstname', 'lastname', 'email', 'username', 'idnumber', 'city', 'country'];
         foreach ($allowedfields as $key) {
             if (!isset($usr->$key) || !is_scalar($usr->$key)) {
                 continue;

@@ -32,7 +32,6 @@
     * friendlyurl - Friendly URL (optional)
     * viewurl - URL to view page
     * deleteurl - URL to delete page
-    * confirmdeletemessage - Full delete confirmation string (from get_string; safe HTML fragment)
 
     Example context (json):
     {
@@ -47,8 +46,7 @@
         "menuname": "sample-page",
         "friendlyurl": "/sample-page",
         "viewurl": "/local/page/?id=123",
-        "deleteurl": "/local/page/pages.php?pagedel=123&sesskey=abc123",
-        "confirmdeletemessage": "Are you sure you want to delete the page 'Sample Page'?"
+        "deleteurl": "/local/page/pages.php?pagedel=123&sesskey=abc123"
     }
 }}
 <div class="custompages-card rounded">
@@ -112,7 +110,7 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{#str}}close, admin{{/str}}"></button>
                     </div>
                     <div class="modal-body">
-                        <p>{{{confirmdeletemessage}}}</p>
+                        <p>{{#str}}confirmdeletepage, local_page, {{name}}{{/str}}</p>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-link col text-center" data-bs-dismiss="modal">

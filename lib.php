@@ -74,7 +74,8 @@ function local_page_ogimage_filemanager_options(): array {
  * Whether the current user may view a local page under the same rules as the public renderer.
  *
  * Mirrors local_page_renderer::showpage() access checks (status, dates, onlyloggedin, accesslevel,
- * site configuration capability override).
+ * site configuration capability override). Pages without a positive database id or with soft-delete
+ * set are never viewable.
  *
  * @param object $page Row from {local_page} (stdClass) or {@see \local_page\custompage} with the same fields
  * @return bool
@@ -85,6 +86,16 @@ function local_page_user_can_view_page(object $page): bool {
     require_once($CFG->libdir . '/accesslib.php');
 
     $context = context_system::instance();
+
+    // Not a persisted row (e.g. missing id lookup) — never treat as publicly viewable.
+    if (empty((int) ($page->id ?? 0))) {
+        return false;
+    }
+
+    // Soft-deleted rows must not be viewable on the front (including via pluginfile checks).
+    if ((int) ($page->deleted ?? 0) !== 0) {
+        return false;
+    }
 
     if (has_capability('moodle/site:config', $context)) {
         return true;
@@ -132,7 +143,36 @@ function local_page_user_can_view_page(object $page): bool {
 }
 
 /**
+ * Whether $hay contains $needle as a whole reference (not as a strict prefix of a longer filename/path).
+ *
+ * The match must end at end-of-string or before a URL/HTML boundary character (?, #, quotes, whitespace,
+ * `<`, `)`, `]`, `&`, or the NUL used to join page fields in the search buffer).
+ *
+ * @param string $hay Content to search
+ * @param string $needle Path fragment to find (non-empty)
+ * @return bool
+ */
+function local_page_haystack_contains_pluginfile_needle(string $hay, string $needle): bool {
+    if ($needle === '') {
+        return false;
+    }
+    $len = strlen($needle);
+    $offset = 0;
+    while (($pos = strpos($hay, $needle, $offset)) !== false) {
+        $next = substr($hay, $pos + $len, 1);
+        if ($next === '' || strpos("\0?#\"' \t\r\n<)&]&", $next) !== false) {
+            return true;
+        }
+        $offset = $pos + 1;
+    }
+    return false;
+}
+
+/**
  * Returns local_page rows whose HTML references a stored file in the pagecontent filearea (itemid 0).
+ *
+ * Candidate rows are still found with SQL LIKE on the filename; references are then confirmed with
+ * anchored matching so one filename cannot satisfy a request for a strict prefix of another.
  *
  * @param int $contextid System context id
  * @param string $filepath File path with leading/trailing slashes (e.g. /sub/)
@@ -171,7 +211,7 @@ function local_page_pages_referencing_pagecontent_file(int $contextid, string $f
     foreach ($candidates as $page) {
         $hay = ($page->pagecontent ?? '') . "\0" . ($page->contenthtml ?? '');
         foreach ($needles as $needle) {
-            if ($needle !== '' && strpos($hay, $needle) !== false) {
+            if (local_page_haystack_contains_pluginfile_needle($hay, $needle)) {
                 $matches[$page->id] = $page;
                 break;
             }

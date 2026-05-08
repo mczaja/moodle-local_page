@@ -109,7 +109,11 @@ class custompage {
         $data = null;
 
         if (intval($id) > 0) {
-            $data = $DB->get_record('local_page', ['id' => intval($id)]);
+            $params = ['id' => intval($id)];
+            if (!$editor) {
+                $params['deleted'] = 0;
+            }
+            $data = $DB->get_record('local_page', $params);
         }
 
         // Handle cases where the page does not exist or has no main content.

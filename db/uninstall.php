@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Version file for component local_page.
+ * Uninstall hook: remove files stored in system context (not purged automatically).
  *
  * @package     local_page
  * @author      Marcin Czaja RoseaThemes
@@ -23,10 +23,17 @@
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die;
+defined('MOODLE_INTERNAL') || die();
 
-$plugin->requires   = 2024100704; // Min. Moodle 4.5.
-$plugin->version    = 2026050802;
-$plugin->release    = 'v1.0.11';
-$plugin->maturity   = MATURITY_STABLE;
-$plugin->component  = 'local_page';
+/**
+ * Cleans up file areas when this plugin is removed.
+ *
+ * @return bool
+ */
+function xmldb_local_page_uninstall() {
+    $fs = get_file_storage();
+    $context = context_system::instance();
+    $fs->delete_area_files($context->id, 'local_page', 'pagecontent');
+    $fs->delete_area_files($context->id, 'local_page', 'ogimage');
+    return true;
+}

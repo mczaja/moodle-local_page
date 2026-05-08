@@ -87,8 +87,6 @@ class page_card implements renderable, templatable {
         $data->id = $this->id;
         $shortname = shorten_text($this->name, 100);
         $data->name = $shortname;
-        // Built in PHP so Mustache does not double-escape $a inside {{#str}} (see modal body).
-        $data->confirmdeletemessage = \get_string('confirmdeletepage', 'local_page', $shortname);
         $data->status = $this->status;
 
         // Generate card body class based on status.

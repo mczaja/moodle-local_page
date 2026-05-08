@@ -1,13 +1,14 @@
-# Scope: this directory only (/local/page/). It does not rewrite top-level friendly URLs
-# such as https://example.com/about-us — those need rules at the Moodle web root; see README.md.
+# Plugin directory only: maps /local/page/<slug> → index.php?menuname=<slug> (mod_rewrite + AllowOverride required).
+# Characters match PARAM_ALPHANUMEXT (includes .). Optional trailing slash on the slug path is accepted.
+# Root-level /about-us URLs are not handled here; add vhost rules under the Moodle docroot (see README.md).
+# If Moodle is in a subdirectory, you may need e.g. RewriteBase /moodle/local/page/ (match your URL path).
 <IfModule mod_rewrite.c>
     RewriteEngine On
 
-    # Redirect requests for index.php to the same URL without index.php
-    RewriteRule ^index\.php$ - [L]
+    # Pass through real files/directories inside this folder.
+    RewriteCond %{REQUEST_FILENAME} -f [OR]
+    RewriteCond %{REQUEST_FILENAME} -d
+    RewriteRule ^ - [L]
 
-    # If the requested file or directory does not exist, redirect to index.php
-    RewriteCond %{REQUEST_FILENAME} !-f
-    RewriteCond %{REQUEST_FILENAME} !-d
-    RewriteRule ^(.*)$ index.php [L]
+    RewriteRule ^([a-zA-Z0-9._-]+)/?$ index.php?menuname=$1 [QSA,L]
 </IfModule>

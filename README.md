@@ -26,12 +26,13 @@ Pages can use a **Friendly URL** slug (`menuname`) so viewers can open
 instead of  
 `https://yourmoodlesite.example/path/to/moodle/local/page/index.php?menuname=about-us`.
 
-### What the plugin does not do
+### Incoming URL routing
 
-- The **`.htaccess` file inside this plugin directory** only applies to URLs under `/local/page/`. It does **not** map root-level paths like `/about-us` to the viewer.
-- Moodle’s optional **`$CFG->urlrewriteclass`** hook only rewrites **outgoing** links when `moodle_url::out()` runs; it does **not** route incoming browser requests by itself.
+- **This plugin’s `.htaccess`** (under `local/page/`) asks Apache to rewrite  
+  `…/local/page/<slug>` → `…/local/page/index.php?menuname=<slug>` when `mod_rewrite` and `AllowOverride` allow it. Slugs use the same character set as the form (`PARAM_ALPHANUMEXT`, including `.`). It does **not** handle **root-level** paths like `…/about-us` (those never hit this directory).
+- Moodle’s optional **`$CFG->urlrewriteclass`** only rewrites **outgoing** URLs from `moodle_url::out()`; it does **not** accept incoming requests by itself.
 
-So for `/about-us` to work, something **outside** this plugin must send that request to PHP (usually Moodle’s `index.php` or this plugin’s `local/page/index.php` with `menuname`).
+So for **short** URLs like `/about-us` at the site root, add **web-root** rewrite rules (below). For **only** `/local/page/about-us`, configuring the server to honour this plugin’s `.htaccess` is enough.
 
 ### Web server: rewrite at the Moodle web root
 
@@ -46,6 +47,8 @@ RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule ^([a-zA-Z0-9_-]+)$ /local/page/index.php?menuname=$1 [L,QSA]
 ```
+
+To match the edit form’s slug rules exactly (including `.` in the slug), use `[a-zA-Z0-9._-]+` instead of `[a-zA-Z0-9_-]+` in both `RewriteRule` and Nginx patterns.
 
 If Moodle is under `/moodle/`, use `RewriteRule ^([a-zA-Z0-9_-]+)$ /moodle/local/page/index.php?menuname=$1 [L,QSA]` (or `RewriteBase /moodle/` and a relative target—match your layout).
 
