@@ -1,23 +1,19 @@
 # CHANGELOG
 
-## [1.0.11] - 2026-05-08
+## [1.0.10] - 2026-05-08
 
 ### Security
 - Viewer no longer loads soft-deleted rows by id or leaks page titles and SEO/meta before access checks resolve.
 - `local_page_pages_referencing_pagecontent_file()` uses anchored substring matching so prefix filename collisions cannot widen pluginfile access.
 
-### Changed
-- Unauthenticated placeholders use core `guest_user()` instead of a hard-coded user id.
-- Delete confirmation uses Mustache `#str`; edit link and layout metadata use loaded page id (`menuname` routes).
-- `menuname` request param aligned with `PARAM_ALPHANUMEXT`; clarified `.htaccess` and README routing notes.
-
 ### Added
 - `db/uninstall.php` purges `pagecontent` and `ogimage` file areas on uninstall.
 
-## [1.0.10] - 2026-05-08
-
 ### Changed
 - The **Simple Content Builder** helper on the page edit screen loads only when **theme_xy** is both **installed** (component and `contentbuilder/builder` Mustache present) and **active** for the current page (`$PAGE->theme` name is `xy`). If xy is installed but another theme is in use, the builder is not injected and the standard editor flow applies.
+- Unauthenticated placeholders use core `guest_user()` instead of a hard-coded user id.
+- Delete confirmation uses Mustache `#str`; edit link and layout metadata use loaded page id (`menuname` routes).
+- `menuname` request param aligned with `PARAM_ALPHANUMEXT`; clarified `.htaccess` and README routing notes.
 
 ## [1.0.9] - 2026-05-07
 
